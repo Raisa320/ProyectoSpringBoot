@@ -1,0 +1,30 @@
+<th:block th:fragment="head">
+    <base href="/">
+    <meta charset="utf-8" />
+    <title th:text="${titulo} + ' - Wabbit'"></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="PIT admin dashboard." />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!--begin::Fonts-->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+    <!--end::Fonts-->
+    <!--begin::Global Theme Styles(used by all pages)-->
+    <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="assets/plugins/custom/prismjs/prismjs.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    <!--end::Global Theme Styles-->
+
+    <!--begin::Layout Themes(used by all pages)-->
+    <link href="assets/css/themes/layout/header/base/light.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/themes/layout/header/menu/light.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/themes/layout/brand/dark.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/themes/layout/aside/dark.css" rel="stylesheet" type="text/css" />
+    <!--end::Layout Themes-->
+
+    <link rel="shortcut icon" href="assets/media/wabbit-icon.ico" />
+    <!--begin::MyCSS-->
+    <link href="assets/css/mystyle.css" rel="stylesheet" type="text/css" />
+    <!--end::MyCSS-->
+</th:block>

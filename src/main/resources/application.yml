@@ -1,0 +1,44 @@
+spring:
+  servlet:
+   multipart:
+         max-file-size: 20MB
+         max-request-size: 20MB    
+  
+  mail:
+    protocol: smtp
+    host: smtp.gmail.com
+    port: 587
+    properties:
+        mail:
+            smtp:              
+                auth: true
+                starttls:
+                    enable: true
+    username: vr3148910@gmail.com 
+    password: 741852rv
+    
+
+  datasource: 
+    url: jdbc:mysql://localhost:3306/dbwabbit?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=GMT-3&useLegacyDatetimeCode=false&characterEncoding=UTF-8
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:      
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect        
+  thymeleaf:
+    cache: false 
+server:
+    error:
+      whitelabel:
+        enabled: false
+    servlet:
+      session:
+        timeout: 6000
+my:
+    property:
+        baseUrl: http://localhost:8080

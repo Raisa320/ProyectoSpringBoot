@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Stockholm-icons / Communication / Share</title>
+    <desc>Created with Sketch.</desc>
+	<defs></defs>
+	<g id="Stockholm-icons-/-Communication-/-Vincular" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+		<rect id="bound" x="0" y="0" width="24" height="24"></rect>
+		<path d="M14.7,9.3c-0.3-0.3-0.7-0.6-1.1-0.9l-0.9,0.9c-0.6,0.6-0.4,1.2-0.4,1.7 c0.1,0.1,0.2,0.2,0.4,0.3c1.1,1.1,1.1,2.9,0,4c-0.2,0.2-5,5-5.1,5.1c-1.1,1.1-2.9,1.1-4,0c-1.1-1.1-1.1-2.9,0-4l3.5-3.5 C7,12.4,6.5,11.2,6.8,9.3c0,0,0,0,0,0l-5.1,5.1c-2.2,2.2-2.2,5.8,0,8c2.2,2.2,5.8,2.2,8,0l5.1-5.1C16.9,15.1,16.8,11.4,14.7,9.3z" id="Path-57" fill="#000000" fill-rule="nonzero" opacity="0.3"></path>
+		<path d="M22.4,1.6c-2.2-2.2-5.8-2.2-8,0L9.7,6.3c-2.3,2.3-2.1,5.9,0,8c0.3,0.3,0.7,0.6,1.1,0.9l0.9-0.9 c0.6-0.6,0.4-1.2,0.4-1.7c-0.1-0.1-0.2-0.2-0.4-0.3c-1.1-1.1-1.1-2.9,0-4c0.2-0.2,4.6-4.6,4.7-4.7c1.1-1.1,2.9-1.1,4,0 c1.1,1.1,1.1,2.9,0,4l-3.1,3.1c0.1,0.5,0.6,1.7,0.4,3.6c0,0,0,0,0,0l4.7-4.7C24.5,7.4,24.5,3.8,22.4,1.6z" id="Shape" fill="#000000" fill-rule="nonzero" transform="translate(15.536799, 8.287129) scale(-1, 1) translate(-15.536799, -8.287129) "></path>
+	</g>
+</svg>
