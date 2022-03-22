@@ -1,10 +1,10 @@
 package pds.wabbit.Servicios;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import pds.wabbit.Entidades.TokenPassword;
 import pds.wabbit.Entidades.Usuario;
 import pds.wabbit.Repositorios.IUsuarioRepositorio;
 import pds.wabbit.errores.ErrorServicio;
@@ -29,8 +30,15 @@ public class UsuarioServicio implements UserDetailsService {
 
     @Autowired
     private IUsuarioRepositorio usuarioRepositorio;
+
+    @Autowired
+    private TokenPasswordServicio secureTokenServicio;
+
+
+
+
     private final static Logger LOGGER = Logger.getLogger("com.soporte.PIT.Servicios.UsuarioServicio");
-    
+
     @Transactional
     public Usuario agregarUsuario(Usuario usuario, List<String> lenguajes) {
         //Encripto clave
@@ -79,6 +87,17 @@ public class UsuarioServicio implements UserDetailsService {
             throw new ErrorServicio("No hay usuario activos con este nombre de usuario");
         }
     }
+    
+    public Usuario buscarUsuarioPorMail(String mail) throws ErrorServicio {
+       Usuario usuario = usuarioRepositorio.buscarUsuarioPorEmail(mail);
+        if (usuario != null) {
+            return usuario;
+        } else {
+            throw new ErrorServicio("No hay usuario activos con este email");
+        }
+    }
+    
+    
 
     public String verificarEmail(String mail) {
         Usuario usuario = usuarioRepositorio.buscarUsuarioPorEmail(mail);
@@ -88,14 +107,32 @@ public class UsuarioServicio implements UserDetailsService {
             return "si";
         }
     }
+    
+    public void cambioPassword(String newPassword,String confirmPassword,String token) throws ErrorServicio{
+        TokenPassword tokenPassword = secureTokenServicio.findByToken(token);
+        if(Objects.isNull(tokenPassword) || tokenPassword.estaExpirado()){
+            throw new ErrorServicio("Token no valido");
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            throw new ErrorServicio("claveIncorrecta");
+        }
+        Usuario usuario = usuarioRepositorio.getById(tokenPassword.getUsuario().getId());
+        if(Objects.isNull(usuario)){
+            throw new ErrorServicio("No se puede encontrar el usuario para el token.");
+        }
+        secureTokenServicio.removeTokenById(tokenPassword.getId());
+        String encriptada = new BCryptPasswordEncoder().encode(newPassword);
+        usuario.setClave(encriptada);
+        usuarioRepositorio.save(usuario);
+    }
 
-
+    
     //ES PARA EL LOGIN IDENTIFICARSE NECESITA UN IMPLEMENTS ARRIBA
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepositorio.buscarUsuarioPorEmail(mail);
         System.out.println("USUARIO:" + usuario);
-         LOGGER.log(Level.INFO, usuario.toString());
+        LOGGER.log(Level.INFO, usuario.toString());
         if (usuario != null) {
 
             List<GrantedAuthority> permisos = new ArrayList<>();
@@ -105,7 +142,7 @@ public class UsuarioServicio implements UserDetailsService {
             ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             HttpSession session = attr.getRequest().getSession(true);
             session.setAttribute("usuariosession", usuario);
-             LOGGER.log(Level.INFO, "Proceso exitoso");
+            LOGGER.log(Level.INFO, "Proceso exitoso");
             User user = new User(usuario.getEmail(), usuario.getClave(), permisos);
             return user;
         } else {

@@ -109,7 +109,7 @@ var KTLogin = function () {
 
                     // Simulate Ajax request
                     setTimeout(function () {
-                        KTUtil.btnRelease(formSubmitButton);
+                        form.submit();
                     }, 2000);
                 })
                 .on('core.form.invalid', function () {
