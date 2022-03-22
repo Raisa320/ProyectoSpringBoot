@@ -39,6 +39,9 @@ server:
     servlet:
       session:
         timeout: 6000
+
 my:
     property:
         baseUrl: http://localhost:8080
+    token:
+        validity: 15000
