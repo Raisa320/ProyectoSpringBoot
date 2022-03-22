@@ -46,15 +46,9 @@ public class Usuario {
     @NotEmpty(message = "Debe Colocar una clave de Usuario")
     private String clave;
 
-    
     @Column(columnDefinition = "boolean default false")
     private Boolean eliminado = false;
 
-    //PARA LA RECUPERACION DE LA CONTRASEÑA
-    private String recuperacion_token;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Calendar recuperacion_fecha_exp;
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
@@ -76,7 +70,10 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     private Sexo sexo;
-    
+
     private String avatar;
 
+    private Integer reputacionAlta;
+    private Integer reputacionMedia;
+    private Integer reputacionBaja;
 }

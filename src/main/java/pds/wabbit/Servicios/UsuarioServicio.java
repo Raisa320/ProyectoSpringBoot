@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -33,9 +35,6 @@ public class UsuarioServicio implements UserDetailsService {
 
     @Autowired
     private TokenPasswordServicio secureTokenServicio;
-
-
-
 
     private final static Logger LOGGER = Logger.getLogger("com.soporte.PIT.Servicios.UsuarioServicio");
 
@@ -87,17 +86,15 @@ public class UsuarioServicio implements UserDetailsService {
             throw new ErrorServicio("No hay usuario activos con este nombre de usuario");
         }
     }
-    
+
     public Usuario buscarUsuarioPorMail(String mail) throws ErrorServicio {
-       Usuario usuario = usuarioRepositorio.buscarUsuarioPorEmail(mail);
+        Usuario usuario = usuarioRepositorio.buscarUsuarioPorEmail(mail);
         if (usuario != null) {
             return usuario;
         } else {
             throw new ErrorServicio("No hay usuario activos con este email");
         }
     }
-    
-    
 
     public String verificarEmail(String mail) {
         Usuario usuario = usuarioRepositorio.buscarUsuarioPorEmail(mail);
@@ -107,17 +104,17 @@ public class UsuarioServicio implements UserDetailsService {
             return "si";
         }
     }
-    
-    public void cambioPassword(String newPassword,String confirmPassword,String token) throws ErrorServicio{
+
+    public void cambioPassword(String newPassword, String confirmPassword, String token) throws ErrorServicio {
         TokenPassword tokenPassword = secureTokenServicio.findByToken(token);
-        if(Objects.isNull(tokenPassword) || tokenPassword.estaExpirado()){
+        if (Objects.isNull(tokenPassword) || tokenPassword.estaExpirado()) {
             throw new ErrorServicio("Token no valido");
         }
         if (!newPassword.equals(confirmPassword)) {
             throw new ErrorServicio("claveIncorrecta");
         }
         Usuario usuario = usuarioRepositorio.getById(tokenPassword.getUsuario().getId());
-        if(Objects.isNull(usuario)){
+        if (Objects.isNull(usuario)) {
             throw new ErrorServicio("No se puede encontrar el usuario para el token.");
         }
         secureTokenServicio.removeTokenById(tokenPassword.getId());
@@ -126,7 +123,30 @@ public class UsuarioServicio implements UserDetailsService {
         usuarioRepositorio.save(usuario);
     }
 
-    
+    public Usuario cambiarPorcentaje(Map<String, Object> params) throws ErrorServicio {
+        if (params.containsKey("id")) {
+            Usuario usuario = buscarUsuarioPorId(params.get("id").toString());
+            if (usuario != null) {
+                Map<String, String> lenguajesMap = new HashMap<>();
+                params.entrySet().forEach(entry -> {
+                    if (!entry.getKey().equals("id")) {
+                        lenguajesMap.put(entry.getKey(), entry.getValue().toString());
+                    }
+                });
+                usuario.setLenguajes(lenguajesMap);
+                return usuarioRepositorio.save(usuario);
+            } else {
+                throw new ErrorServicio("Id no existe");
+            }
+        } else {
+            throw new ErrorServicio("Se ha eliminado la clave");
+        }
+    }
+
+    public Page<Usuario> usuariosActivos(PageRequest pageRequest) {
+        return usuarioRepositorio.usuariosActivos(pageRequest);
+    }
+
     //ES PARA EL LOGIN IDENTIFICARSE NECESITA UN IMPLEMENTS ARRIBA
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
