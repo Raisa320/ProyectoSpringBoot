@@ -99,7 +99,12 @@ public class UsuarioServicio implements UserDetailsService {
     public String verificarEmail(String mail) {
         Usuario usuario = usuarioRepositorio.buscarUsuarioPorEmail(mail);
         if (usuario != null) {
-            return "no";
+            if (usuario.isCuentaVerificada()) {
+                return "no";
+            }else{
+                usuarioRepositorio.delete(usuario);
+                return "si";
+            }
         } else {
             return "si";
         }
@@ -120,6 +125,20 @@ public class UsuarioServicio implements UserDetailsService {
         secureTokenServicio.removeTokenById(tokenPassword.getId());
         String encriptada = new BCryptPasswordEncoder().encode(newPassword);
         usuario.setClave(encriptada);
+        usuarioRepositorio.save(usuario);
+    }
+    
+    public void verificarCuenta(String token)throws ErrorServicio{
+        TokenPassword tokenPassword = secureTokenServicio.findByToken(token);
+        if (Objects.isNull(tokenPassword) || tokenPassword.estaExpirado()) {
+            throw new ErrorServicio("Token no valido");
+        }
+        Usuario usuario = usuarioRepositorio.getById(tokenPassword.getUsuario().getId());
+        if (Objects.isNull(usuario)) {
+            throw new ErrorServicio("No se puede encontrar el usuario para el token.");
+        }
+        secureTokenServicio.removeTokenById(tokenPassword.getId());
+        usuario.setCuentaVerificada(Boolean.TRUE);
         usuarioRepositorio.save(usuario);
     }
 
@@ -163,7 +182,12 @@ public class UsuarioServicio implements UserDetailsService {
             HttpSession session = attr.getRequest().getSession(true);
             session.setAttribute("usuariosession", usuario);
             LOGGER.log(Level.INFO, "Proceso exitoso");
-            User user = new User(usuario.getEmail(), usuario.getClave(), permisos);
+            boolean activo=!usuario.isCuentaVerificada(); //false por defecto
+            UserDetails user=User.withUsername(usuario.getEmail())
+                    .password(usuario.getClave())
+                    .disabled(activo)
+                    .authorities(permisos).build();
+//            User user = new User(usuario.getEmail(), usuario.getClave(), permisos);
             return user;
         } else {
             //Paso un usuario sin permisos para que lo fuerce a loguearse
