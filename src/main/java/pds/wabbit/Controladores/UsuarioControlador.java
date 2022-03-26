@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +24,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pds.wabbit.Entidades.Usuario;
 import pds.wabbit.Enumeraciones.Lenguajes;
@@ -172,6 +175,14 @@ public class UsuarioControlador {
         }
         
         return "redirect:/usuario/all";
+    }
+    
+    @PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')")
+    @RequestMapping(value = "/edit-psw", method = RequestMethod.POST)
+    @ResponseBody
+    public String agregarObsevacionAjax(@RequestParam Map<String, Object> params) throws JSONException, ErrorServicio {
+        
+        return usuarioServicio.modificarPassword(params);
     }
 
 }
