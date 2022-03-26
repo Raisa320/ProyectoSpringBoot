@@ -96,7 +96,8 @@ public class ControladorInicio {
     }
 
     @GetMapping("/login")
-    public String login(Model modelo, @RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String exito) {
+    public String login(Model modelo, @RequestParam(required = false) String error, @RequestParam(required = false) String logout,
+            @RequestParam(required = false) String exito, @RequestParam(required = false) String tk) {
         modelo.addAttribute("usuario", new Usuario());
         modelo.addAttribute("titulo", "Login");
         if (error != null) {
@@ -111,6 +112,22 @@ public class ControladorInicio {
         if (exito != null) {
             modelo.addAttribute("mensaje", " Se ha enviado un correo electrónico para la recuperación de su contraseña.");
             modelo.addAttribute("clase", "success");
+        }
+        if (tk != null) {
+            if (!secureTokenServicio.tokenValido(tk)) {
+                modelo.addAttribute("mensaje", "El tiempo de espera para realizar el cambio ya ha expirado");
+                modelo.addAttribute("clase", "danger");
+            } else {
+                try {
+                    usuarioServicio.verificarCuenta(tk);
+                    modelo.addAttribute("mensaje", " Se ha verificado con éxito el usuario, puede iniciar sesión.");
+                    modelo.addAttribute("clase", "success");
+                } catch (ErrorServicio e) {
+                    modelo.addAttribute("mensaje", e.getMessage());
+                    modelo.addAttribute("clase", "danger");
+                }
+
+            }
         }
         return "signin.html";
     }
@@ -183,14 +200,14 @@ public class ControladorInicio {
                 return "redirect:/cambiar-password/" + token;
             } else {
                 redirAttr
-                    .addFlashAttribute("mensaje", e.getMessage())
-                    .addFlashAttribute("clase", "danger");
+                        .addFlashAttribute("mensaje", e.getMessage())
+                        .addFlashAttribute("clase", "danger");
                 return "redirect:/login";
             }
         }
         redirAttr
-                    .addFlashAttribute("mensaje", "Su password ha sido modificado con éxito.")
-                    .addFlashAttribute("clase", "success");
+                .addFlashAttribute("mensaje", "Su password ha sido modificado con éxito.")
+                .addFlashAttribute("clase", "success");
         return "redirect:/login";
     }
 
@@ -211,6 +228,14 @@ public class ControladorInicio {
     public String altaUsuarioPost(@Valid @ModelAttribute("usuario") Usuario usuario, BindingResult result, ModelMap modelo, RedirectAttributes redirectAttrs, @RequestParam List<String> lenguajes) throws ErrorServicio {
         try {
             Usuario user = usuarioServicio.agregarUsuario(usuario, lenguajes);
+            TokenPassword secureToken = secureTokenServicio.crearSecureToken(usuarioServicio.buscarUsuarioPorMail(user.getEmail()));
+            modelo.put("titulo", "Verificación de correo");
+            modelo.put("url", url + "/login?tk=" + secureToken.getToken());
+            modelo.put("titulo", "Verificación de correo");
+            modelo.put("tituloBoton", "Verificar cuenta");
+            modelo.put("cuerpo", "Usted ha recibido este email debido a que se ha solicitado su registro en la app Wabbi. ");
+            //FIN DE VARIABLES
+            mailServicio.sendEmail(usuarioServicio.buscarUsuarioPorMail(user.getEmail()), modelo);
         } catch (Exception e) {
             System.out.println("ERROR:" + e);
             redirectAttrs
@@ -219,8 +244,8 @@ public class ControladorInicio {
             return "redirect:/login";
         }
         redirectAttrs
-                .addFlashAttribute("mensaje", "Se ha registrado correctamente. Inicie sesión.")
-                .addFlashAttribute("clase", "success");
+                .addFlashAttribute("mensaje", "Verifique su email para iniciar sesión")
+                .addFlashAttribute("clase", "warning");
         return "redirect:/login";
     }
 

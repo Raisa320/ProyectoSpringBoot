@@ -76,4 +76,7 @@ public class Usuario {
     private Integer reputacionAlta;
     private Integer reputacionMedia;
     private Integer reputacionBaja;
+    
+    private boolean cuentaVerificada;
+    
 }
