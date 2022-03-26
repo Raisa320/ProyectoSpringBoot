@@ -9,6 +9,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -101,7 +104,7 @@ public class UsuarioServicio implements UserDetailsService {
         if (usuario != null) {
             if (usuario.isCuentaVerificada()) {
                 return "no";
-            }else{
+            } else {
                 usuarioRepositorio.delete(usuario);
                 return "si";
             }
@@ -127,8 +130,8 @@ public class UsuarioServicio implements UserDetailsService {
         usuario.setClave(encriptada);
         usuarioRepositorio.save(usuario);
     }
-    
-    public void verificarCuenta(String token)throws ErrorServicio{
+
+    public void verificarCuenta(String token) throws ErrorServicio {
         TokenPassword tokenPassword = secureTokenServicio.findByToken(token);
         if (Objects.isNull(tokenPassword) || tokenPassword.estaExpirado()) {
             throw new ErrorServicio("Token no valido");
@@ -166,6 +169,41 @@ public class UsuarioServicio implements UserDetailsService {
         return usuarioRepositorio.usuariosActivos(pageRequest);
     }
 
+    public String modificarPassword(Map<String, Object> params) throws JSONException, ErrorServicio {
+        JSONArray results = new JSONArray();
+        JSONObject objetoData = new JSONObject();
+        if (!params.containsKey("contrsActual") || !params.containsKey("contraNueva") || !params.containsKey("contraRepetida") || !params.containsKey("idUser")) {
+            objetoData.put("status", "error");
+            objetoData.put("mensaje", "Todos los campos son obligatorios.");
+        } else if (params.get("contrsActual").toString().isEmpty() || params.get("contraNueva").toString().isEmpty() || params.get("contraRepetida").toString().isEmpty() || params.get("idUser").toString().isEmpty()) {
+            objetoData.put("status", "error");
+            objetoData.put("mensaje", "Todos los campos son obligatorios.");
+        } else if (!params.get("contraNueva").toString().equals(params.get("contraRepetida").toString())) {
+            objetoData.put("status", "error");
+            objetoData.put("mensaje", "Las claves no coinciden.");
+        } else {
+            Usuario usuario = usuarioRepositorio.getById(params.get("idUser").toString());
+            if (Objects.isNull(usuario)) {
+                objetoData.put("status", "error");
+                objetoData.put("mensaje", "El id del usuario es incorrecto.");
+            } else {
+                BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+                if (!bcrypt.matches(params.get("contrsActual").toString(), usuario.getClave())) {
+                    objetoData.put("status", "error");
+                    objetoData.put("mensaje", "La contraseña actual no es correcta.");
+                } else {
+                    objetoData.put("status", "ok");
+                    objetoData.put("mensaje", "La contraseña ha sido modificada correctamente");
+                    String encriptada = new BCryptPasswordEncoder().encode(params.get("contraNueva").toString());
+                    usuario.setClave(encriptada);
+                    usuarioRepositorio.save(usuario);
+                }
+            }
+        }
+        results.put(objetoData);
+        return results.toString();
+    }
+
     //ES PARA EL LOGIN IDENTIFICARSE NECESITA UN IMPLEMENTS ARRIBA
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
@@ -182,8 +220,8 @@ public class UsuarioServicio implements UserDetailsService {
             HttpSession session = attr.getRequest().getSession(true);
             session.setAttribute("usuariosession", usuario);
             LOGGER.log(Level.INFO, "Proceso exitoso");
-            boolean activo=!usuario.isCuentaVerificada(); //false por defecto
-            UserDetails user=User.withUsername(usuario.getEmail())
+            boolean activo = !usuario.isCuentaVerificada(); //false por defecto
+            UserDetails user = User.withUsername(usuario.getEmail())
                     .password(usuario.getClave())
                     .disabled(activo)
                     .authorities(permisos).build();
