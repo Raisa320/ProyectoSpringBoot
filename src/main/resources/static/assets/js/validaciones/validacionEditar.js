@@ -1,6 +1,8 @@
 // Class definition
 var KTFormControls = function () {
     // Private functions
+    var email = $("#email").val();
+    var form = document.getElementById('formEditar');
     var _initDemo1 = function () {
         var validator = FormValidation.formValidation(
                 document.getElementById('formEditar'),
@@ -81,10 +83,49 @@ var KTFormControls = function () {
                         // Validate fields when clicking the Submit button
                         submitButton: new FormValidation.plugins.SubmitButton(),
                         // Submit the form when all fields are valid
-                        defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                        // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
                     }
                 }
-        );
+        ).on('core.form.valid', function () {
+            var email2 = $("#email").val();
+            if (email === email2) {
+                form.submit();
+            } else {
+                var request = $.ajax({
+                    url: "/verificaEmail/" + email,
+                    type: "get"
+                });
+                request.done(function (response, textStatus, jqXHR) {
+                    console.log(response);
+                    if (response === "si") {
+                        form.submit();
+                    } else {
+                        Swal.fire({
+                            text: "El correo que proporciona ya se encuentra registrado, intente con otro.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, entendido!",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light"
+                            }
+                        });
+                    }
+
+                });
+                request.fail(function (jqXHR, textStatus) {
+                    Swal.fire({
+                        text: "¡Error en el servidor!.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, entendido!",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-primary",
+                        }
+                    });
+                });
+            }
+
+        });
         $('#selectSexo').on('change', function () {
             // Revalidate field
             validator.revalidateField('sexo');
@@ -195,7 +236,7 @@ var KTFormControls = function () {
                                             <circle fill="#000000" opacity="0.3" cx="12" cy="12" r="10"/>
                                             <path d="M12.0355339,10.6213203 L14.863961,7.79289322 C15.2544853,7.40236893 15.8876503,7.40236893 16.2781746,7.79289322 C16.6686989,8.18341751 16.6686989,8.81658249 16.2781746,9.20710678 L13.4497475,12.0355339 L16.2781746,14.863961 C16.6686989,15.2544853 16.6686989,15.8876503 16.2781746,16.2781746 C15.8876503,16.6686989 15.2544853,16.6686989 14.863961,16.2781746 L12.0355339,13.4497475 L9.20710678,16.2781746 C8.81658249,16.6686989 8.18341751,16.6686989 7.79289322,16.2781746 C7.40236893,15.8876503 7.40236893,15.2544853 7.79289322,14.863961 L10.6213203,12.0355339 L7.79289322,9.20710678 C7.40236893,8.81658249 7.40236893,8.18341751 7.79289322,7.79289322 C8.18341751,7.40236893 8.81658249,7.40236893 9.20710678,7.79289322 L12.0355339,10.6213203 Z" fill="#000000"/>
                                         </g>
-                                      </svg></span> `+" "+respuesta[0].mensaje;
+                                      </svg></span> ` + " " + respuesta[0].mensaje;
                     $("#mensaje").append(mensajeErr);
                 }
                 if (respuesta[0].status === "ok") {
@@ -210,7 +251,7 @@ var KTFormControls = function () {
                     }).then(function () {
                         window.location.assign("/login?logout");
                     });
-                    
+
                 }
             });
             request.fail(function (jqXHR, textStatus) {
@@ -230,11 +271,13 @@ var KTFormControls = function () {
         init: function () {
             _initDemo1();
             _initDemo2();
+
         }
     };
 }();
 
 jQuery(document).ready(function () {
+
     KTFormControls.init();
 });
 

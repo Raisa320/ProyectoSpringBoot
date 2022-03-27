@@ -71,7 +71,14 @@ public class UsuarioServicio implements UserDetailsService {
             }
         });
         usuario.setLenguajes(lenguajesMap2);
-        return usuarioRepositorio.save(usuario);
+        if (!user.getEmail().equals(usuario.getEmail())) {
+            usuario.setCuentaVerificada(Boolean.FALSE);
+            usuarioRepositorio.save(usuario);
+            throw new ErrorServicio("email");
+        } else {
+            usuario.setCuentaVerificada(Boolean.TRUE);
+            return usuarioRepositorio.save(usuario);
+        }
     }
 
     @Transactional

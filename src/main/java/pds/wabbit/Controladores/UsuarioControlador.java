@@ -1,17 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package pds.wabbit.Controladores;
 
+import freemarker.template.TemplateException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,13 +28,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import pds.wabbit.Entidades.TokenPassword;
 import pds.wabbit.Entidades.Usuario;
 import pds.wabbit.Enumeraciones.Lenguajes;
 import pds.wabbit.Enumeraciones.Nivel;
 import pds.wabbit.Enumeraciones.Rol;
 import pds.wabbit.Enumeraciones.Sexo;
 import pds.wabbit.Enumeraciones.Temas;
+import pds.wabbit.Servicios.EmailServicio;
 import pds.wabbit.Servicios.ProyectoServicio;
+import pds.wabbit.Servicios.TokenPasswordServicio;
 import pds.wabbit.Servicios.UsuarioServicio;
 import pds.wabbit.errores.ErrorServicio;
 
@@ -52,6 +55,15 @@ public class UsuarioControlador {
 
     @Autowired
     private ProyectoServicio proyectoServicio;
+
+    @Autowired
+    private EmailServicio mailServicio;
+
+    @Autowired
+    private TokenPasswordServicio secureTokenServicio;
+
+    @Value("${my.property.baseUrl}")
+    private String url;
 
     @GetMapping(value = {"/perfil", "/perfil/{idUser}"})
     public String perfil(Model modelo, HttpSession session, @PathVariable(required = false) String idUser) throws ErrorServicio {
@@ -88,13 +100,24 @@ public class UsuarioControlador {
     }
 
     @PostMapping("/edit")
-    public String altaUsuarioPost(@Valid @ModelAttribute("usuario") Usuario usuario, BindingResult result, ModelMap modelo, RedirectAttributes redirectAttrs, @RequestParam List<String> lenguajes, HttpSession session) throws ErrorServicio {
+    public String altaUsuarioPost(@Valid @ModelAttribute("usuario") Usuario usuario, BindingResult result, ModelMap modelo, RedirectAttributes redirectAttrs, @RequestParam List<String> lenguajes, HttpSession session) throws ErrorServicio, MessagingException, IOException, TemplateException {
         try {
             Usuario user = usuarioServicio.updateUsuario(usuario, lenguajes);
             session.setAttribute("usuariosession", user);
 
         } catch (Exception e) {
             System.out.println("ERROR:" + e);
+            if (e.getMessage().equals("email")) {
+                TokenPassword secureToken = secureTokenServicio.crearSecureToken(usuarioServicio.buscarUsuarioPorMail(usuario.getEmail()));
+                modelo.put("titulo", "Verificación de correo");
+                modelo.put("url", url + "/login?tk=" + secureToken.getToken());
+                modelo.put("titulo", "Verificación de correo");
+                modelo.put("tituloBoton", "Verificar cuenta");
+                modelo.put("cuerpo", "Usted ha recibido este email debido a que se ha solicitado su registro en la app Wabbi. ");
+                //FIN DE VARIABLES
+                mailServicio.sendEmail(usuarioServicio.buscarUsuarioPorMail(usuario.getEmail()), modelo);
+                return "redirect:/login?logout";
+            }
             redirectAttrs
                     .addFlashAttribute("mensaje", e.getMessage())
                     .addFlashAttribute("clase", "danger");
@@ -173,15 +196,15 @@ public class UsuarioControlador {
         if (params.get("user") == "" && params.get("lenguajes") == "" && params.get("roles") == "") {
             return "redirect:/usuario/all";
         }
-        
+
         return "redirect:/usuario/all";
     }
-    
+
     @PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')")
     @RequestMapping(value = "/edit-psw", method = RequestMethod.POST)
     @ResponseBody
     public String agregarObsevacionAjax(@RequestParam Map<String, Object> params) throws JSONException, ErrorServicio {
-        
+
         return usuarioServicio.modificarPassword(params);
     }
 
