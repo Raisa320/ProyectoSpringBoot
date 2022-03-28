@@ -172,34 +172,68 @@ public class UsuarioControlador {
         baseModeloListar(modelo);
         int page = params.get("page") != null ? Integer.valueOf(params.get("page").toString()) - 1 : 0;
         PageRequest pageRequest = PageRequest.of(page, 12);
-        Page<Usuario> pageUsuario = usuarioServicio.usuariosActivos(pageRequest);
-        modelo.addAttribute("total", pageUsuario.getTotalElements());
+        Page<Usuario> pageUsuario = usuarioServicio.usuariosActivos(pageRequest);    
         int totalPage = pageUsuario.getTotalPages();
         if (totalPage > 0) {
             List<Integer> pages = IntStream.rangeClosed(1, totalPage).boxed().collect(Collectors.toList());
             modelo.addAttribute("pages", pages);
         }
-        modelo.addAttribute("list", pageUsuario.getContent());
-        modelo.addAttribute("mostrando", pageUsuario.getContent().size());
-        modelo.addAttribute("current", page + 1);
-        modelo.addAttribute("next", page + 2);
-        modelo.addAttribute("prev", page);
+        basePaginar(modelo,pageUsuario,page);
         modelo.addAttribute("last", totalPage);
         return "usuario/usuarios.html";
     }
 
     @PostMapping("/buscar")
     public String buscarUsuario(@RequestParam Map<String, Object> params, Model modelo) {
-        for (Map.Entry<String, Object> entry : params.entrySet()) {
-            System.out.println(entry.getKey() + ":" + entry.getValue());
-        }
-        if (params.get("user") == "" && params.get("lenguajes") == "" && params.get("roles") == "") {
+        if (params.isEmpty()) {
             return "redirect:/usuario/all";
         }
-
-        return "redirect:/usuario/all";
+        if (params.get("user") == "" && params.get("lengu") == "" && params.get("role") == "") {
+            return "redirect:/usuario/all";
+        }
+        String link = "";
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            if (entry.getValue() != "") {
+                link = entry.getKey() + "=" + entry.getValue() + "&" + link;
+            }
+        }
+        return "redirect:/usuario/filter?" + link.replaceFirst(".$", "");
     }
 
+    @GetMapping("/filter")
+    public String buscarListado(@RequestParam Map<String, Object> params, Model modelo) {
+        baseModeloListar(modelo);
+        String link = "";
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            if (entry.getValue() != "" && !entry.getKey().equals("page")) {
+                link = entry.getKey() + "=" + entry.getValue() + "&" + link;
+                modelo.addAttribute(entry.getKey(), entry.getValue());
+            }
+        }
+        int page = params.get("page") != null ? Integer.valueOf(params.get("page").toString()) - 1 : 0;
+        PageRequest pageRequest = PageRequest.of(page, 12);
+        Page<Usuario> pageUsuario = usuarioServicio.usuariosFiltrado(pageRequest,params);
+        int totalPage = pageUsuario.getTotalPages();
+        if (totalPage > 0) {
+            List<Integer> pages = IntStream.rangeClosed(1, totalPage).boxed().collect(Collectors.toList());
+            modelo.addAttribute("pages", pages);
+        }
+        basePaginar(modelo,pageUsuario,page);
+        modelo.addAttribute("last", totalPage);
+        modelo.addAttribute("url", "/usuario/filter?" + link);
+        return "usuario/usuarios.html";
+    }
+    
+     public Model basePaginar(Model modelo,Page<Usuario> pageUsuario, int page) {
+        modelo.addAttribute("total", pageUsuario.getTotalElements());
+        modelo.addAttribute("list", pageUsuario.getContent());
+        modelo.addAttribute("mostrando", pageUsuario.getContent().size());
+        modelo.addAttribute("current", page + 1);
+        modelo.addAttribute("next", page + 2);
+        modelo.addAttribute("prev", page);
+        return modelo;
+    }
+    
     @PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')")
     @RequestMapping(value = "/edit-psw", method = RequestMethod.POST)
     @ResponseBody

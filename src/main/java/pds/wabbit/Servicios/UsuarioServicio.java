@@ -1,5 +1,6 @@
 package pds.wabbit.Servicios;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -27,6 +30,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import pds.wabbit.Entidades.TokenPassword;
 import pds.wabbit.Entidades.Usuario;
+import pds.wabbit.Enumeraciones.Rol;
 import pds.wabbit.Repositorios.IUsuarioRepositorio;
 import pds.wabbit.errores.ErrorServicio;
 
@@ -174,6 +178,43 @@ public class UsuarioServicio implements UserDetailsService {
 
     public Page<Usuario> usuariosActivos(PageRequest pageRequest) {
         return usuarioRepositorio.usuariosActivos(pageRequest);
+    }
+
+    public Page<Usuario> usuariosFiltrado(PageRequest pageRequest, Map<String, Object> params) {
+        List<Usuario> usuarios = usuarioRepositorio.usuariosActivos();
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            if (!entry.getKey().equals("page")) {
+                String filtro = entry.getValue().toString();
+                System.out.println("FILTRO:" + filtro);
+                if (entry.getKey().equals("user")) {
+                    filtro = cleanString(params.get("user").toString().toLowerCase());
+                }
+                usuarios = filtro(usuarios, filtro);
+            }
+        }
+        return listConvertToPage1(usuarios, pageRequest);
+    }
+
+    //Esta función toma un string (filtro) y filtra todas las observaciones que no tengan ningun string que contenga este filtro
+    public List<Usuario> filtro(List<Usuario> listUbicaciones, String filtro) {
+        List<Usuario> copy = new ArrayList<Usuario>(listUbicaciones);
+        copy.removeIf(o
+                -> (!o.getNombre().toLowerCase().contains(filtro))
+                && !o.getApellido().toLowerCase().contains(filtro) && !o.getRol().toString().equals(filtro) && !o.getLenguajes().containsKey(filtro)
+        );
+        return copy;
+    }
+
+    public static String cleanString(String texto) {
+        texto = Normalizer.normalize(texto, Normalizer.Form.NFD);
+        texto = texto.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return texto;
+    }
+
+    public static <T> Page<T> listConvertToPage1(List<T> list, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > list.size() ? list.size() : (start + pageable.getPageSize());
+        return new PageImpl<>(list.subList(start, end), pageable, list.size());
     }
 
     public String modificarPassword(Map<String, Object> params) throws JSONException, ErrorServicio {
