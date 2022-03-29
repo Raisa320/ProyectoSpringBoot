@@ -88,11 +88,13 @@ var KTFormControls = function () {
                 }
         ).on('core.form.valid', function () {
             var email2 = $("#email").val();
+            console.log(email)
+            console.log(email2)
             if (email === email2) {
                 form.submit();
             } else {
                 var request = $.ajax({
-                    url: "/verificaEmail/" + email,
+                    url: "/verificaEmail/" + email2,
                     type: "get"
                 });
                 request.done(function (response, textStatus, jqXHR) {

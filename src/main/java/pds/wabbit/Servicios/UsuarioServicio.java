@@ -63,6 +63,7 @@ public class UsuarioServicio implements UserDetailsService {
     public Usuario updateUsuario(Usuario usuario, List<String> lenguajes) throws ErrorServicio {
         System.out.println("USUARIO UPDATE:" + usuario);
         Usuario user = buscarUsuarioPorId(usuario.getId());
+        System.out.println("USUARIO ANTIGUO:" + user);
         Map<String, String> lenguajesMap = user.getLenguajes();
         Map<String, String> lenguajesMap2 = new HashMap<>();
 
@@ -112,6 +113,8 @@ public class UsuarioServicio implements UserDetailsService {
 
     public String verificarEmail(String mail) {
         Usuario usuario = usuarioRepositorio.buscarUsuarioPorEmail(mail);
+        System.out.println("MAIL:"+mail);
+        System.out.println("USUARIO:"+usuario);
         if (usuario != null) {
             if (usuario.isCuentaVerificada()) {
                 return "no";
