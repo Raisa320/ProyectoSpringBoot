@@ -26,5 +26,8 @@ public interface IProyectoRepositorio extends JpaRepository<Proyecto, String> {
     @Query("SELECT s FROM Proyecto s WHERE s.estadosProyecto!='Finalizado' ORDER BY s.fechaCreacion DESC")
     public List<Proyecto> allRecents();
     
+    @Query(nativeQuery = true,value="SELECT proyecto_id FROM proyecto_lenguajes WHERE lenguajes=:leng")
+    public List<String> idProyectosPorLenguaje(@Param("leng") String leng);
+    
     
 }
