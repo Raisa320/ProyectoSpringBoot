@@ -1,11 +1,18 @@
 package pds.wabbit.Controladores;
 
+import freemarker.template.TemplateException;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,13 +27,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import pds.wabbit.Entidades.Postulacion;
 import pds.wabbit.Entidades.Proyecto;
 import pds.wabbit.Entidades.Usuario;
 import pds.wabbit.Enumeraciones.EstadosProyecto;
 import pds.wabbit.Enumeraciones.Lenguajes;
-import pds.wabbit.Enumeraciones.Rol;
 import pds.wabbit.Enumeraciones.Temas;
 import pds.wabbit.Repositorios.IProyectoRepositorio;
 import pds.wabbit.Servicios.EmailServicio;
@@ -66,6 +75,19 @@ public class ProyectoControlador {
         return "proyecto/crearProyecto.html";
     }
 
+    @GetMapping("/editar/{proyectoid}")
+    public String editarProyecto(Model modelo, HttpSession session, @PathVariable String proyectoid) throws ErrorServicio {
+        modelo.addAttribute("titulo", "Proyecto");
+        Usuario perfil = (Usuario) session.getAttribute("usuariosession");
+        modelo.addAttribute("usuario", perfil);
+        modelo.addAttribute("lenguajes", Lenguajes.values());
+        modelo.addAttribute("estados", EstadosProyecto.values());
+        modelo.addAttribute("proyecto", proyectoServicio.buscarProyectoPorId(proyectoid));
+        modelo.addAttribute("temas", Temas.values());
+        modelo.addAttribute("modoEditar", "true");
+        return "proyecto/crearProyecto.html";
+    }
+
     @GetMapping("/misProyectos")
     public String misProyectos(Model modelo, HttpSession session) {
         modelo.addAttribute("titulo", "Proyecto");
@@ -74,6 +96,23 @@ public class ProyectoControlador {
         modelo.addAttribute("temas", Temas.class);
         modelo.addAttribute("activarItem", "mproyect");
         return "proyecto/misProyectos.html";
+    }
+
+    @GetMapping("/participante")
+    public String participante(Model modelo, HttpSession session, RedirectAttributes redirectAttrs) {
+        try {
+            modelo.addAttribute("titulo", "Proyecto");
+            Usuario usuario = (Usuario) session.getAttribute("usuariosession");
+            modelo.addAttribute("proyectos", proyectoServicio.proyectosDondeParticipa(usuario.getId()));
+            modelo.addAttribute("temas", Temas.class);
+            modelo.addAttribute("activarItem", "mproyect");
+            return "proyecto/proyectosParticipante.html";
+        } catch (ErrorServicio ex) {
+            redirectAttrs
+                    .addFlashAttribute("mensaje", "Error en el id de usuario")
+                    .addFlashAttribute("clase", "danger");
+            return "redirect:/";
+        }
     }
 
     @GetMapping("/proyectos/{idUsuario}")
@@ -207,13 +246,13 @@ public class ProyectoControlador {
             Page<Proyecto> pageProyectos = Page.empty(pageRequest);
             String retorna = "redirect:/";
             if (params.get("listaTema").toString().equals("temas")) {
-                pageProyectos = proyectoServicio.filtroTema(params.get("nombreP").toString(),Temas.valueOf(params.get("temaUrl").toString()), pageRequest);
+                pageProyectos = proyectoServicio.filtroTema(params.get("nombreP").toString(), Temas.valueOf(params.get("temaUrl").toString()), pageRequest);
                 baseModeloListar("Temas Proyectos", "temas", params.get("temaUrl").toString(), user, modelo);
                 modelo.addAttribute("lenguajesEnum", Lenguajes.class);
                 modelo.addAttribute("temaTexto", Temas.valueOf(params.get("temaUrl").toString()).getValue());
                 retorna = "proyecto/listadoTemas";
             } else if (params.get("listaTema").toString().equals("lenguajes")) {
-                pageProyectos = proyectoServicio.filtroLenguaje(params.get("nombreP").toString(),params.get("temaUrl").toString(), pageRequest);
+                pageProyectos = proyectoServicio.filtroLenguaje(params.get("nombreP").toString(), params.get("temaUrl").toString(), pageRequest);
                 baseModeloListar("Lenguajes Proyectos", "lenguajes", params.get("temaUrl").toString(), user, modelo);
                 modelo.addAttribute("temasEnum", Temas.class);
                 modelo.addAttribute("temaTexto", Lenguajes.valueOf(params.get("temaUrl").toString()).getValue());
@@ -230,4 +269,271 @@ public class ProyectoControlador {
         return "redirect:/";
     }
 
+    @GetMapping("/guardados")
+    public String gurdados(Model modelo, HttpSession session) {
+        modelo.addAttribute("titulo", "Proyecto");
+        Usuario usuario = (Usuario) session.getAttribute("usuariosession");
+        modelo.addAttribute("proyectos", proyectoServicio.proyectosGuardadosPorUsuario(usuario.getId()));
+        modelo.addAttribute("temas", Temas.class);
+        modelo.addAttribute("activarItem", "mproyect");
+        return "proyecto/proyectosGuardados.html";
+    }
+
+    @GetMapping("/proceso")
+    public String proceso(ModelMap modelo, HttpSession session) {
+        modelo.addAttribute("titulo", "Proyectos");
+        Usuario perfil = (Usuario) session.getAttribute("usuariosession");
+        modelo.addAttribute("usuario", perfil);
+        modelo.addAttribute("lenguajesEnum", Lenguajes.class);
+        modelo.addAttribute("proyectos", proyectoServicio.projectsProceso());
+        return "proyecto/listadoReportes";
+    }
+
+    @GetMapping("/vacios")
+    public String vacio(ModelMap modelo, HttpSession session) {
+        modelo.addAttribute("titulo", "Proyectos");
+        Usuario perfil = (Usuario) session.getAttribute("usuariosession");
+        modelo.addAttribute("usuario", perfil);
+        modelo.addAttribute("lenguajesEnum", Lenguajes.class);
+        modelo.addAttribute("proyectos", proyectoServicio.projectsVacio());
+        return "proyecto/listadoReportes";
+    }
+
+    @GetMapping("/postulantes")
+    public String conPostulantes(ModelMap modelo, HttpSession session) {
+        modelo.addAttribute("titulo", "Proyectos");
+        Usuario perfil = (Usuario) session.getAttribute("usuariosession");
+        modelo.addAttribute("usuario", perfil);
+        modelo.addAttribute("lenguajesEnum", Lenguajes.class);
+        modelo.addAttribute("proyectos", proyectoServicio.projectsPostulantes());
+        return "proyecto/listadoReportes";
+    }
+
+    @GetMapping("/eliminar-proyecto/{idProyecto}")
+    public String eliminar(@PathVariable String idProyecto, RedirectAttributes redirectAttrs, HttpSession session) {
+        try {
+            Usuario perfil = (Usuario) session.getAttribute("usuariosession");
+            proyectoServicio.eliminar(idProyecto, perfil);
+            redirectAttrs
+                    .addFlashAttribute("mensaje", "Proyecto eliminado correctamente")
+                    .addFlashAttribute("clase", "success");
+        } catch (Exception e) {
+            System.out.println("ERROR:" + e);
+            redirectAttrs
+                    .addFlashAttribute("mensaje", e.getMessage())
+                    .addFlashAttribute("clase", "danger");
+        }
+        return "redirect:/proyecto/misProyectos";
+    }
+
+    @GetMapping("/eliminar-guardado/{idProyecto}")
+    public String eliminarGuardado(@PathVariable String idProyecto, RedirectAttributes redirectAttrs, HttpSession session) {
+        try {
+            Usuario perfil = (Usuario) session.getAttribute("usuariosession");
+            proyectoServicio.eliminarGuardado(idProyecto, perfil);
+            redirectAttrs
+                    .addFlashAttribute("mensaje", "Proyecto eliminado de la lista correctamente")
+                    .addFlashAttribute("clase", "success");
+        } catch (Exception e) {
+            System.out.println("ERROR:" + e);
+            redirectAttrs
+                    .addFlashAttribute("mensaje", e.getMessage())
+                    .addFlashAttribute("clase", "danger");
+        }
+        return "redirect:/proyecto/guardados";
+    }
+
+    @GetMapping("/ver-proyecto/{idProyecto}")
+    public String verProyecto(Model modelo, HttpSession session, @PathVariable String idProyecto) throws ErrorServicio {
+        modelo.addAttribute("titulo", "Proyecto");
+        Usuario perfil = (Usuario) session.getAttribute("usuariosession");
+        modelo.addAttribute("usuario", perfil);
+        modelo.addAttribute("lenguajesProgra", Lenguajes.class);
+        modelo.addAttribute("temasEnum", Temas.class);
+        modelo.addAttribute("estados", EstadosProyecto.values());
+        modelo.addAttribute("proyecto", proyectoServicio.buscarProyectoPorId(idProyecto));
+        String unido = "false";
+        for (Usuario participante : proyectoServicio.buscarProyectoPorId(idProyecto).getParticipantes()) {
+            if (participante.getId().equals(perfil.getId())) {
+                unido = "true";
+                break;
+            }
+        }
+        if (!proyectoServicio.postuladosProyectoUsuario(perfil.getId(), idProyecto).isEmpty()) {
+            modelo.addAttribute("unirse", "pendiente");
+        }
+        if (!proyectoServicio.votosProyectoUsuario(perfil.getId(), idProyecto).isEmpty()) {
+            modelo.addAttribute("like", "true");
+        }
+        modelo.addAttribute("unido", unido);
+        //modelo.addAttribute("temas", Temas.values());
+        return "proyecto/vistaProyecto.html";
+    }
+
+    @RequestMapping(value = "/like/{idProyecto}/{idUsuario}", method = RequestMethod.GET)
+    @ResponseBody
+    public String likeProyectoAjax(@PathVariable String idProyecto, @PathVariable String idUsuario) throws JSONException, ErrorServicio {
+        return proyectoServicio.likeProyectoAjax(idProyecto, idUsuario);
+    }
+
+    @RequestMapping(value = "/dislike/{idProyecto}/{idUsuario}", method = RequestMethod.GET)
+    @ResponseBody
+    public String dislikeProyectoAjax(@PathVariable String idProyecto, @PathVariable String idUsuario) throws JSONException, ErrorServicio {
+        return proyectoServicio.dislikeProyectoAjax(idProyecto, idUsuario);
+    }
+
+    @RequestMapping(value = "/guardar/{idProyecto}/{idUsuario}", method = RequestMethod.GET)
+    @ResponseBody
+    public String guardarProyectoAjax(@PathVariable String idProyecto, @PathVariable String idUsuario) throws JSONException, ErrorServicio {
+        return proyectoServicio.guardarProyectoAjax(idProyecto, idUsuario);
+    }
+
+    @GetMapping("/finalizar/{idProyecto}")
+    public String finalizar(Model modelo, @PathVariable String idProyecto) throws ErrorServicio {
+        modelo.addAttribute("titulo", "Finalizar Proyecto");
+        Proyecto proyecto = proyectoServicio.buscarProyectoPorId(idProyecto);
+        proyectoServicio.finalizar(proyecto);
+        return "redirect:/proyecto/ver-proyecto/" + idProyecto;
+    }
+
+    @GetMapping("/rechazar/{proyectoId}/{usuarioId}")
+    public String rechazar(Model modelo, @PathVariable String proyectoId, @PathVariable String usuarioId, RedirectAttributes redirectAttrs) {
+        proyectoServicio.rechazarPostulacion(proyectoId, usuarioId);
+        redirectAttrs
+                .addFlashAttribute("mensaje", "Solicitud Rechazada y eliminada.")
+                .addFlashAttribute("clase", "danger");
+        return "redirect:/";
+    }
+
+    @GetMapping("/aceptar/{proyectoId}/{usuarioId}")
+    public String aceptar(Model modelo, @PathVariable String proyectoId, @PathVariable String usuarioId, RedirectAttributes redirectAttrs) throws ErrorServicio {
+        try {
+            Usuario usuario = usuarioServicio.buscarUsuarioPorId(usuarioId);
+            proyectoServicio.aceptarPostulacion(proyectoId, usuario);
+            /////VARIABLES  QUE VAN AL HTML DE ENVIO DE EMAIL
+            Map<String, Object> model = new HashMap<>();
+            model.put("usuario", usuario);
+            model.put("titulo", "Tu solicitud ha sido aceptada!");
+            model.put("url", url + "/proyecto/ver-proyecto/" + proyectoId);
+            model.put("tituloBoton", "Ver Proyecto");
+            model.put("cuerpo", "Estamos emocionados de notificarte que tu solicitud para unirte a un proyecto, ha sido aceptada. Para ver el proyecto, simplemente presione el botón de abajo. Envía un correo al dueño del proyecto para poder comunicarse.");
+            //FIN DE VARIABLES
+            mailServicio.sendEmail(usuario, model);
+            redirectAttrs
+                    .addFlashAttribute("mensaje", "Usuario agregado al proyecto.")
+                    .addFlashAttribute("clase", "success");
+            return "redirect:/";
+        } catch (MessagingException | IOException | TemplateException ex) {
+            Logger.getLogger(ProyectoControlador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "redirect:/";
+    }
+
+    @GetMapping("/calificar/{idProyecto}")
+    public String calificar(Model modelo, @PathVariable String idProyecto, HttpSession session) throws ErrorServicio {
+        modelo.addAttribute("titulo", "Proyecto");
+        Proyecto proyecto = proyectoServicio.buscarProyectoPorId(idProyecto);
+        if (proyecto.getEstadosProyecto().name().equalsIgnoreCase("Finalizado")) {
+            return "redirect:/";
+        } else {
+            //PRIMERO FINALIZAR EL PROYECTO DE PASO :v
+            proyectoServicio.finalizar(proyecto);
+            //ENVIO PROYECTO :c
+            modelo.addAttribute("proyecto", proyecto);
+            //modelo.addAttribute("temas", Temas.values());
+            return "proyecto/calificacionPart.html";
+        }
+    }
+
+    @GetMapping(value = {"/unirme/{proyectoId}/{usuarioId}/{mensaje}", "/unirme/{proyectoId}/{usuarioId}"})
+    public String unirmeProyecto(Model modelo, HttpSession session, @PathVariable String proyectoId, @PathVariable String usuarioId,@PathVariable(required = false) String mensaje, RedirectAttributes redirectAttrs) throws ErrorServicio {
+        try {
+            modelo.addAttribute("titulo", "Proyecto");
+            modelo.addAttribute("unirse", "true");
+            Map<String, Object> model = proyectoServicio.postulacionProyecto(proyectoId, usuarioId,mensaje);
+            redirectAttrs
+                    .addFlashAttribute("mensaje", "Se ha enviado la solicitud satisfactoriamente.")
+                    .addFlashAttribute("clase", "success");
+            mailServicio.sendEmail(proyectoServicio.buscarProyectoPorId(proyectoId).getUsuarioCreador(), model);
+            return "redirect:/proyecto/ver-proyecto/" + proyectoId;
+        } catch (ErrorServicio | MessagingException | IOException | TemplateException ex) {
+            Logger.getLogger(ProyectoControlador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "redirect:/proyecto/ver-proyecto/" + proyectoId;
+    }
+    
+    @GetMapping("/ver-solicitud/{proyectoId}/{usuarioId}")
+    public String vistaSolicitud(Model modelo, HttpSession session, @PathVariable String proyectoId, @PathVariable String usuarioId, RedirectAttributes redirectAttrs) throws ErrorServicio {
+        modelo.addAttribute("titulo", "Solicitud");
+        List<Postulacion> postulacions=proyectoServicio.postuladosProyectoUsuario(usuarioId, proyectoId);
+        if (!postulacions.isEmpty()) {
+            Usuario perfil = usuarioServicio.buscarUsuarioPorId(usuarioId);
+            modelo.addAttribute("usuario", perfil);
+            modelo.addAttribute("mensajeSolicitud", postulacions.get(0).getMensaje());
+            modelo.addAttribute("lenguajesEnum", Lenguajes.class);
+            modelo.addAttribute("estados", EstadosProyecto.values());
+            modelo.addAttribute("proyecto", proyectoServicio.buscarProyectoPorId(proyectoId));
+            return "proyecto/solicitud.html";
+        }
+        redirectAttrs
+                .addFlashAttribute("mensaje", "La solicitud ya no está disponible.")
+                .addFlashAttribute("clase", "danger");
+        return "redirect:/";
+    }
+    
+    @GetMapping("/misSolicitudes")
+    public String misPostulados(Model modelo, HttpSession session) {
+        modelo.addAttribute("titulo", "Proyecto");
+        Usuario usuario = (Usuario) session.getAttribute("usuariosession");
+        modelo.addAttribute("proyectos", proyectoServicio.proyectosPostulados(usuario.getId()));
+        modelo.addAttribute("activarItem", "msolicitud");
+        return "proyecto/misPostulaciones.html";
+    }
+    
+    @GetMapping("/participantes/{idProyecto}")
+    public String participantes(Model modelo, @PathVariable String idProyecto) throws ErrorServicio {
+        modelo.addAttribute("titulo", "Proyecto Participantes");
+        Proyecto proyecto = proyectoServicio.buscarProyectoPorId(idProyecto);
+        modelo.addAttribute("participantes", proyecto.getParticipantes());
+        modelo.addAttribute("id", proyecto.getId());
+        modelo.addAttribute("creador", proyecto.getUsuarioCreador().getId());
+        modelo.addAttribute("lenguajesEnum", Lenguajes.class);
+        return "proyecto/participantes";
+    }
+    
+    @GetMapping("/eliminar-participante/{idProyecto}")
+    public String eliminarP(@PathVariable String idProyecto, RedirectAttributes redirectAttrs, HttpSession session) {
+        try {
+            Proyecto proyecto=proyectoServicio.buscarProyectoPorId(idProyecto);
+            proyecto.getParticipantes().remove(0);
+            proyectoRepositorio.save(proyecto);
+            redirectAttrs
+                    .addFlashAttribute("mensaje", "Usuario eliminado correctamente")
+                    .addFlashAttribute("clase", "success");
+        } catch (Exception e) {
+            System.out.println("ERROR:" + e);
+            redirectAttrs
+                    .addFlashAttribute("mensaje", e.getMessage())
+                    .addFlashAttribute("clase", "danger");
+        }
+        return "redirect:/proyecto/misProyectos";
+    }
+    
+    @GetMapping("/colab/{idUsuario}")
+    public String participanteUsuario(Model modelo, HttpSession session, RedirectAttributes redirectAttrs, @PathVariable String idUsuario) {
+        try {
+            modelo.addAttribute("titulo", "Proyectos");
+            modelo.addAttribute("usuario", usuarioServicio.buscarUsuarioPorId(idUsuario));
+            modelo.addAttribute("modoPerfil", "true");
+            modelo.addAttribute("proyectos", proyectoServicio.proyectosDondeParticipa(idUsuario));
+            modelo.addAttribute("temas", Temas.class);
+            return "proyecto/proyectosParticipante.html";
+        } catch (ErrorServicio ex) {
+            redirectAttrs
+                    .addFlashAttribute("mensaje", "Error en el id de usuario")
+                    .addFlashAttribute("clase", "danger");
+            return "redirect:/";
+        }
+    }
+    
 }

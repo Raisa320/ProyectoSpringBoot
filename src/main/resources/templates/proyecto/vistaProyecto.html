@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <!--begin::Head-->
+    <head>
+        <link th:replace="layout/head::head" th:remove="tag">
+    </head>
+    <!--end::Head-->
+    <!--begin::Body-->
+    <body id="kt_body" class="header-fixed header-mobile-fixed subheader-enabled subheader-fixed aside-enabled aside-fixed aside-minimize-hoverable page-loading">
+        <!--begin::Main-->
+        <!--begin::Header Mobile-->
+        <div th:replace="layout/header-mobile::header-mobile"></div>
+        <!--end::Header Mobile-->
+
+        <div class="d-flex flex-column flex-root">
+            <!--begin::Page-->
+            <div class="d-flex flex-row flex-column-fluid page">
+                <!--begin::Aside-->
+                <!--begin::Aside-->
+                <div th:replace="layout/aside::aside"></div>
+                <!--end::Aside-->
+                <!--begin::Wrapper-->
+                <div class="d-flex flex-column flex-row-fluid wrapper" id="kt_wrapper">
+                    <!--begin::WrapperHeader-->
+                    <div th:replace="layout/wrapper-header"></div>
+                    <!--end::WrapperHeader-->
+                    <!--begin::Content-->
+                    <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+                        <!--                        begin::Subheader
+                                                <div th:replace="layout/subheader::subheader"></div>
+                                                end::Subheader-->
+                        <!--begin::Entry-->
+                        <div class="d-flex flex-column-fluid">
+                            <!--begin::Container-->
+                            <div class="container">
+                                <!--begin::Notice-->
+                                <div th:if="${mensaje != null}"  th:classappend="'alert-light-' + (${clase != null} ? ${clase})"
+                                     class="alert alert-custom  fade show mb-5" role="alert">
+                                    <div class="alert-icon"><i class="flaticon-warning"></i></div>
+                                    <div th:text="${mensaje}" class="alert-text"></div>
+                                    <div class="alert-close">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!--end::Notice-->
+                                <!--begin::Card-->
+                                <div class="card card-custom gutter-b m-lg-7">
+                                    <div class="card-body">
+                                        <div class="d-flex">
+                                            <!--begin: Info-->
+                                            <div class="flex-grow-1">
+                                                <!--begin: Title-->
+                                                <div class="d-flex align-items-center justify-content-between flex-wrap">
+                                                    <div class="mr-3">
+                                                        <!--begin::Name-->
+                                                        <a class="d-flex align-items-center text-dark font-size-h1 font-weight-bold mr-3" th:text='${proyecto.nombre}'>Nexa - Next generation SAAS</a>
+                                                        <!--end::Name-->
+                                                        <!--begin::Contacts-->
+                                                        <div class="d-flex flex-wrap my-2">
+                                                            <a th:href="${session.usuariosession.id==proyecto.usuarioCreador.id}?@{'/usuario/perfil'}:@{'/usuario/perfil/'+${proyecto.usuarioCreador.id}}" class="text-muted text-hover-primary font-weight-bold mr-lg-8 mr-5 mb-lg-0 mb-2">
+                                                                <span class="svg-icon svg-icon-md svg-icon-gray-500 mr-1">
+                                                                    <!--begin::Svg Icon | path:/metronic/theme/html/demo1/dist/assets/media/svg/icons/Communication/Mail-notification.svg-->
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                    <polygon points="0 0 24 0 24 24 0 24"/>
+                                                                    <path d="M12,11 C9.790861,11 8,9.209139 8,7 C8,4.790861 9.790861,3 12,3 C14.209139,3 16,4.790861 16,7 C16,9.209139 14.209139,11 12,11 Z" fill="#000000" fill-rule="nonzero" opacity="0.3"/>
+                                                                    <path d="M3.00065168,20.1992055 C3.38825852,15.4265159 7.26191235,13 11.9833413,13 C16.7712164,13 20.7048837,15.2931929 20.9979143,20.2 C21.0095879,20.3954741 20.9979143,21 20.2466999,21 C16.541124,21 11.0347247,21 3.72750223,21 C3.47671215,21 2.97953825,20.45918 3.00065168,20.1992055 Z" fill="#000000" fill-rule="nonzero"/>
+                                                                    </g>
+                                                                    </svg>
+                                                                    <!--end::Svg Icon-->
+                                                                </span><span th:text="${proyecto.usuarioCreador.nombre + ' '+proyecto.usuarioCreador.apellido}"></span></a>
+                                                            <a class="text-muted font-weight-bold mr-lg-8 mr-5 mb-lg-0 mb-2">
+                                                                <span class="svg-icon svg-icon-md svg-icon-gray-500 mr-1">
+                                                                    <!--begin::Svg Icon | path:/metronic/theme/html/demo1/dist/assets/media/svg/icons/General/Lock.svg-->
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                    <rect x="0" y="0" width="24" height="24"/>
+                                                                    <polygon fill="#000000" opacity="0.3" points="6 3 18 3 20 6.5 4 6.5"/>
+                                                                    <path d="M6,5 L18,5 C19.1045695,5 20,5.8954305 20,7 L20,19 C20,20.1045695 19.1045695,21 18,21 L6,21 C4.8954305,21 4,20.1045695 4,19 L4,7 C4,5.8954305 4.8954305,5 6,5 Z M9,9 C8.44771525,9 8,9.44771525 8,10 C8,10.5522847 8.44771525,11 9,11 L15,11 C15.5522847,11 16,10.5522847 16,10 C16,9.44771525 15.5522847,9 15,9 L9,9 Z" fill="#000000"/>
+                                                                    </g>
+                                                                    </svg>
+                                                                    <!--end::Svg Icon-->
+                                                                </span><span th:text="${#dates.format(proyecto.fechaCreacion, 'dd MMMM yyyy')}"></span></a>
+                                                            <!--PARA ICONO DE ACTIVO O EN PROCESO DEL PROYECTO NO DE FINALIZADO-->
+                                                            <a th:if="${proyecto.estadosProyecto.name()!='Finalizado'}" th:classappend="${proyecto.estadosProyecto.name()=='Activo'?'text-success':'text-warning'}" class="font-weight-bold">
+                                                                <span th:classappend="${proyecto.estadosProyecto.name()=='Activo'?'svg-icon-success':'svg-icon-warning'}" class="svg-icon svg-icon-md mr-1">
+                                                                    <!--begin::Svg Icon | path:/metronic/theme/html/demo1/dist/assets/media/svg/icons/Map/Marker2.svg-->
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                    <mask fill="white">
+                                                                        <use xlink:href="#path-1"/>
+                                                                    </mask>
+                                                                    <g/>
+                                                                    <path d="M15.6274517,4.55882251 L14.4693753,6.2959371 C13.9280401,5.51296885 13.0239252,5 12,5 C10.3431458,5 9,6.34314575 9,8 L9,10 L14,10 L17,10 L18,10 C19.1045695,10 20,10.8954305 20,12 L20,18 C20,19.1045695 19.1045695,20 18,20 L6,20 C4.8954305,20 4,19.1045695 4,18 L4,12 C4,10.8954305 4.8954305,10 6,10 L7,10 L7,8 C7,5.23857625 9.23857625,3 12,3 C13.4280904,3 14.7163444,3.59871093 15.6274517,4.55882251 Z" fill="#000000"/>
+                                                                    </g>
+                                                                    </svg>
+                                                                    <!--end::Svg Icon-->
+                                                                </span><span th:text="${proyecto.estadosProyecto.name()}"></span></a>
+                                                            <!--PARA EL ICONO DE FINALIZADO SOLO APARECE SI YA CERRÓ DEL PROYECTO-->
+                                                            <a th:if="${proyecto.estadosProyecto.name()=='Finalizado'}"  class="text-danger font-weight-bold">
+                                                                <span class="svg-icon svg-icon-md svg-icon-danger mr-1">
+                                                                    <!--begin::Svg Icon | path:/metronic/theme/html/demo1/dist/assets/media/svg/icons/Map/Marker2.svg-->
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                    <mask fill="white">
+                                                                        <use xlink:href="#path-1"/>
+                                                                    </mask>
+                                                                    <g/>
+                                                                    <path d="M7,10 L7,8 C7,5.23857625 9.23857625,3 12,3 C14.7614237,3 17,5.23857625 17,8 L17,10 L18,10 C19.1045695,10 20,10.8954305 20,12 L20,18 C20,19.1045695 19.1045695,20 18,20 L6,20 C4.8954305,20 4,19.1045695 4,18 L4,12 C4,10.8954305 4.8954305,10 6,10 L7,10 Z M12,5 C10.3431458,5 9,6.34314575 9,8 L9,10 L15,10 L15,8 C15,6.34314575 13.6568542,5 12,5 Z" fill="#000000"/>
+                                                                    </g>
+                                                                    </svg>
+                                                                    <!--end::Svg Icon-->
+                                                                </span><span th:text="${proyecto.estadosProyecto.name()}"></span></a>
+                                                        </div>
+                                                        <!--end::Contacts-->
+                                                    </div>
+                                                    <div class="my-lg-0 my-1">
+                                                        <a th:if="${session.usuariosession.id!=proyecto.usuarioCreador.id && proyecto.estadosProyecto.name()!='Finalizado' && proyecto.cupos>0 && unido!='true' && unirse==null}" th:href="@{'proyecto/unirme/'+${proyecto.id}+'/'+${session.usuariosession.id}}" th:classappend="${unirse==null?'btn-light-success':'btn-light-primary'}" class="btn btn-sm font-weight-bolder text-uppercase mr-3" id='unirse' th:text="${unirse==null?'UNIRME':'Solicitud Pendiente'}"></a>
+                                                        <a th:if="${session.usuariosession.id!=proyecto.usuarioCreador.id && proyecto.estadosProyecto.name()!='Finalizado' && proyecto.cupos>0 && unido!='true' && unirse!=null}" th:classappend="${unirse==null?'btn-light-success':'btn-primary'}" class="btn btn-sm font-weight-bolder text-uppercase mr-3" th:text="${unirse==null?'UNIRME':'Solicitud Pendiente'}"></a>
+                                                        <a th:if="${session.usuariosession.id==proyecto.usuarioCreador.id}" th:href="@{'proyecto/editar/'+${proyecto.id}}" class="btn btn-sm btn-light-warning font-weight-bolder text-uppercase mr-3">Editar</a>
+
+                                                    </div>
+                                                </div>
+                                                <!--end: Title-->
+                                                <!--begin: Content-->
+                                                <div class=" align-items-center  justify-content-between">
+                                                    <div class="font-weight-bold mb-2">Descripción del proyecto:</div>
+                                                    <div class="flex-grow-1 font-weight-bold text-dark-50 py-5 py-lg-2 mr-5" th:text="${proyecto.descripcion}"></div>
+                                                    <div class="d-flex flex-wrap align-items-center py-2">
+                                                        <div class="d-flex align-items-center mr-10">
+                                                            <div class="mr-6">
+                                                                <div class="font-weight-bold mb-2">Área</div>
+                                                                <span class="btn btn-sm btn-text btn-light-primary text-uppercase font-weight-bold" th:text="${temasEnum.valueOf(proyecto.tema).getValue()}">Sistemas de seguridad informatica</span>
+                                                            </div>
+                                                            <div class="">
+                                                                <div class="font-weight-bold mb-2">Lenguajes</div>
+                                                                <span class="btn btn-sm btn-text btn-light-info text-uppercase font-weight-bold mr-2" th:each="leng:${proyecto.lenguajes}" th:text='${lenguajesProgra.valueOf(leng).getValue()}'></span>
+                                                            </div>
+                                                        </div>
+                                                        <div th:if="${session.usuariosession.id==proyecto.usuarioCreador.id && proyecto.estadosProyecto.name()!='Finalizado'}" class="flex-grow-1 flex-shrink-0 w-150px w-xl-300px mt-4 mt-sm-0">
+                                                            <span class="font-weight-bold">Finalizar Proyecto</span>
+                                                            <div class="col-3 p-0">
+                                                                <span class="switch switch-icon">
+                                                                    <label>
+                                                                        <input type="checkbox"  th:name="${proyecto.participantes.size()}" id="check" th:onchange="finalizar([[${proyecto.id}]])"/>
+                                                                        <span></span>
+                                                                    </label>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div th:if="${unido=='true'}" class="text-muted font-weight-bold mr-lg-8 mr-5 mb-lg-0 mt-2">
+                                                        <p class="mb-0">*Tú ya formas parte de este proyecto.</p>
+                                                    </div>
+                                                </div>
+                                                <!--end: Content-->
+                                            </div>
+                                            <!--end: Info-->
+                                        </div>
+                                        <div class="separator separator-solid my-7"></div>
+                                        <!--begin: Items-->
+                                        <div class="d-flex align-items-center flex-wrap">
+                                            <!--begin: Item-->
+                                            <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                                                <a th:onclick="meGusta([[${proyecto.id}]],[[${session.usuariosession.id}]])" th:classappend="${like!=null?'text-hover-muted':'text-hover-danger'}" class="mr-4" id='etiquetaUrl' style="cursor: pointer;">
+                                                    <i th:classappend="${like!=null?'text-danger':'text-muted'}" class="flaticon-black icon-2x font-weight-bold" id='megusta'></i>
+                                                </a>
+                                                <div class="d-flex flex-column text-dark-75">
+                                                    <span class="font-weight-bolder font-size-sm">Me gusta</span>
+                                                    <span class="font-weight-bolder font-size-h5" id="nroGusta" th:text="${proyecto.votos!=null?proyecto.votos:'0'}"></span>
+                                                </div>
+                                            </div>
+                                            <!--end: Item-->
+                                            <!--begin: Item-->
+                                            <div th:if="${proyecto.estadosProyecto.name()!='Finalizado'}" class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                                                <span class="mr-4">
+                                                    <i class="flaticon-confetti icon-2x text-muted font-weight-bold"></i>
+                                                </span>
+                                                <div class="d-flex flex-column text-dark-75">
+                                                    <span class="font-weight-bolder font-size-sm">Vacantes</span>
+                                                    <span class="font-weight-bolder font-size-h6 text-dark-50">
+                                                        <span class="text-dark font-weight-bold font-size-h4" th:text="${proyecto.cupos}"></span> disp.</span>
+                                                </div>
+                                            </div>
+                                            <!--end: Item-->
+                                            <!--begin: Item-->
+                                            <div class="d-flex align-items-center flex-lg-fill my-1">
+                                                <span class="mr-4">
+                                                    <i class="flaticon-network icon-2x text-muted font-weight-bold"></i>
+                                                </span>
+                                                <!--SI NO HAY PARTICIPANTES-->
+                                                <div th:if="${proyecto.participantes.size()<=0}" class="d-flex flex-column text-dark-75">
+                                                    <span class="font-weight-bolder font-size-sm">Participantes</span>
+                                                    <span class="font-weight-bolder font-size-h6 text-dark-50">
+                                                        <span class="text-dark font-weight-bold font-size-h4" th:text="${proyecto.participantes.size()}"></span>
+                                                    </span>
+                                                </div>
+                                                <!--SI HAY PARTICIPANTES-->
+
+                                                <div th:if="${proyecto.participantes.size()>0}" class="symbol-group symbol-hover">
+                                                    <div th:each="user,iterador:${proyecto.participantes}" th:if="${iterador.index<5}" class="symbol symbol-30 symbol-circle symbol-light-success" data-toggle="tooltip" th:title="${user.nombre+' '+user.apellido}">
+                                                        <span th:if="${user.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${user.nombre.substring(0,1)}"></span>
+                                                        <img th:if="${user.avatar!=null}" th:src="${'assets/media/svg/avatars/'+user.avatar+'.svg'}" />
+                                                      
+                                                    </div>
+                                                    <div th:if="${proyecto.participantes.size()<5}" class="symbol symbol-30 symbol-circle symbol-light">
+                                                        <a th:href="@{'proyecto/participantes/'+${proyecto.id}}" class="symbol-label font-weight-bold" th:text="'Ver'"></a>
+                                                    </div>
+                                                    <div th:if="${proyecto.participantes.size()>5}" class="symbol symbol-30 symbol-circle symbol-light">
+                                                        <a th:href="@{'proyecto/participantes/'+${proyecto.id}}" class="symbol-label font-weight-bold" th:text="'+'+${proyecto.participantes.size()-5}"></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--end: Item-->
+                                        </div>
+                                        <!--begin: Items-->
+                                    </div>
+                                </div>
+                                <!--end::Card-->
+                                <!--begin: CHAT-->
+<!--                                <div th:if="${(unido=='true' || session.usuariosession.id==proyecto.usuarioCreador.id) && proyecto.participantes.size()>0 && proyecto.estadosProyecto.name()!='Finalizado'}" class="d-flex flex-row mr-lg-7">
+                                    begin::Content
+                                    <div class="flex-row-fluid ml-lg-7" id="kt_chat_content">
+                                        begin::Card
+                                        <div class="card card-custom">
+                                            begin::Header
+                                            <div class="card-header align-items-center px-4 py-3">
+                                                <div class="text-left flex-grow-1">
+                                                </div>
+                                                <div class="text-center text-center">
+                                                    <div class="symbol-group symbol-hover justify-content-center">
+                                                        <div class="symbol symbol-30 symbol-circle symbol-light-success" data-toggle="tooltip" th:title="${proyecto.usuarioCreador.nombre+' '+proyecto.usuarioCreador.apellido}">
+                                                            <span th:if="${proyecto.usuarioCreador.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${proyecto.usuarioCreador.nombre.substring(0,1)}"></span>
+                                                            <img th:if="${proyecto.usuarioCreador.avatar!=null}" th:src="${'assets/media/svg/avatars/'+proyecto.usuarioCreador.avatar+'.svg'}" />
+                                                        </div>
+                                                        <div th:each="user,iterador:${proyecto.participantes}" th:if="${iterador.index<5}" class="symbol symbol-30 symbol-circle symbol-light-success" data-toggle="tooltip" th:title="${user.nombre+' '+user.apellido}">
+                                                            <span th:if="${user.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${user.nombre.substring(0,1)}"></span>
+                                                            <img th:if="${user.avatar!=null}" th:src="${'assets/media/svg/avatars/'+user.avatar+'.svg'}" />
+                                                        </div>
+                                                        <div th:if="${proyecto.participantes.size()>5}" class="symbol symbol-30 symbol-circle symbol-light">
+                                                            <a th:href="@{'proyecto/participantes/'+${proyecto.id}}" class="symbol-label font-weight-bold" th:text="'+'+${proyecto.participantes.size()-5}"></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right flex-grow-1">
+                                                    begin::Dropdown Menu
+                                                    end::Dropdown Menu
+                                                </div>
+                                            </div>
+                                            end::Header
+                                            begin::Body
+                                            <div class="card-body">
+                                                begin::Scroll
+                                                <div class="scroll scroll-pull h-250px" data-mobile-height="350" id="scrollear">
+                                                    begin::Messages
+                                                    <div class="messages" id="messageCuerpo">
+                                                        
+                                                    </div>
+                                                    end::Messages
+                                                </div>
+                                                end::Scroll
+                                            </div>
+                                            end::Body
+                                            begin::Footer
+                                            <div class="card-footer align-items-center">
+                                                begin::Compose
+                                                <form id="chat-ux">
+                                                    <input type="hidden" id="idUser" name="idUser" th:value="${session.usuariosession.id}">
+                                                    <input type="hidden" id="username" name="username" th:value="${session.usuariosession.apellido+' '+session.usuariosession.nombre}">
+                                                    <input type="hidden" id="proyctId" name="proyctId" th:value="${proyecto.id}">
+                                                    <textarea class="form-control border-0 p-0" id="message" rows="2" placeholder="Escribe un mensaje..."></textarea>
+                                                    <div class="d-flex align-items-center justify-content-between mt-5">
+                                                        <div class="mr-3">
+                                                        </div>
+                                                        <div>
+                                                            <button type="button" class="btn btn-primary btn-md text-uppercase font-weight-bold chat-send py-2 px-6" id="send">Enviar</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                                begin::Compose
+                                            </div>
+                                            end::Footer
+                                        </div>
+                                        end::Card
+                                    </div>
+                                    end::Content
+                                </div>-->
+                                <!--end::Chat-->
+                            </div>
+                            <!--end::Container-->
+                        </div>
+                        <!--end::Entry-->
+                    </div>
+                    <!--end::Content-->
+                    <!--begin::Footer-->
+                    <div th:replace="layout/footer::footer"></div>
+                    <!--end::Footer-->
+                </div>
+                <!--end::Wrapper-->
+            </div>
+            <!--end::Page-->
+        </div>
+        <!--end::Main-->
+
+        <!-- begin::User Panel-->
+        <div th:replace="layout/user-panel::user-panel"></div>
+        <!-- end::User Panel-->
+
+        <!--begin::QuickPanel el del costado del user-->
+        <div th:replace="layout/quick-panel::quickPanel"></div>
+        <!--end::QuickPanel-->
+
+        <!--begin::Scrolltop-->
+        <div th:replace="layout/scrollTop::scrollTop"></div>
+        <!--end::Scrolltop-->
+
+        <!--end::Global Theme Bundle-->
+    <scripts th:replace="layout/scripts::scripts"></scripts>
+    <!--begin::Page Vendors(used by this page)-->
+    <script src="assets/js/sockjs.min.js"></script>
+    <script src="assets/js/stomp.min.js"></script>
+    <script src="assets/js/proyecto/chatSocket.js"></script>
+    <script src="assets/js/widgets/chat.js"></script>
+    <script src="assets/js/proyecto/proyectoUnirse.js"></script>
+    
+    <!--end::Page Vendors-->
+</body>
+<!--end::Body-->
+</html>

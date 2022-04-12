@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <!--begin::Head-->
+    <head>
+        <link th:replace="layout/head::head" th:remove="tag">
+    </head>
+    <!--end::Head-->
+    <!--begin::Body-->
+    <body id="kt_body" class="header-fixed header-mobile-fixed subheader-enabled subheader-fixed aside-enabled aside-fixed aside-minimize-hoverable page-loading">
+        <!--begin::Main-->
+        <!--begin::Header Mobile-->
+        <div th:replace="layout/header-mobile::header-mobile"></div>
+        <!--end::Header Mobile-->
+
+        <div class="d-flex flex-column flex-root">
+            <!--begin::Page-->
+            <div class="d-flex flex-row flex-column-fluid page">
+                <!--begin::Aside-->
+                <!--begin::Aside-->
+                <div th:replace="layout/aside::aside"></div>
+                <!--end::Aside-->
+                <!--begin::Wrapper-->
+                <div class="d-flex flex-column flex-row-fluid wrapper" id="kt_wrapper">
+                    <!--begin::WrapperHeader-->
+                    <div th:replace="layout/wrapper-header"></div>
+                    <!--end::WrapperHeader-->
+                    <!--begin::Content-->
+                    <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+                        <!--                        begin::Subheader
+                                                <div th:replace="layout/subheader::subheader"></div>
+                                                end::Subheader-->
+                        <!--begin::Entry-->
+                        <div class="d-flex flex-column-fluid">
+                            <!--begin::Container-->
+                            <div class="container">
+                                <!--begin::Notice-->
+                                <div th:if="${mensaje != null}"  th:classappend="'alert-light-' + (${clase != null} ? ${clase})"
+                                     class="alert alert-custom  fade show mb-5" role="alert">
+                                    <div class="alert-icon"><i class="flaticon-warning"></i></div>
+                                    <div th:text="${mensaje}" class="alert-text"></div>
+                                    <div class="alert-close">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!--end::Notice-->
+                                <!--begin::Card-->
+                                <div class="d-flex align-items-center justify-content-center w-100 h-100">
+                                    <div class="card card-custom card-solicitud gutter-b w-70 justify-content-between">
+                                        <div class="d-flex card-header justify-content-center">
+                                            <div class="card-title d-flex flex-column justify-content-center wm-70">
+                                                <div class="text-center ">
+                                                    <a class="card-label">
+                                                        <small th:text="${usuario.nombre+' '+usuario.apellido}+' quiere unirse a tu proyecto:'"></small>
+                                                    </a>
+                                                </div>
+                                                <div class="titulo-proyecto justify-content-center text-center mt-3">
+                                                    <h2 th:text="${proyecto.nombre}"></h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body w-80">
+                                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                                <div class="d-flex">
+                                                    <div class="symbol symbol-60 symbol-xxl-150 align-self-start align-self-xxl-center">
+                                                        <div class="symbol-label">
+                                                            <span th:if="${usuario.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${usuario.nombre.substring(0,1)}"></span>
+                                                            <img th:if="${usuario.avatar!=null}" th:src="${'assets/media/svg/avatars/'+usuario.avatar+'.svg'}" />
+                                                        </div>
+                                                        <i class="symbol-badge bg-success"></i>
+                                                    </div>
+                                                    <div class="d-flex flex-column">
+                                                        <div class="d-flex mt-2 align-items-center">
+                                                            <a class="text-dark font-weight-bold font-size-h4 mb-lg-0 mb-2 ml-5" th:text="${usuario.nombre+' '+usuario.apellido}"></a>
+                                                            <div class="cont-btn-verPerfil align-items-center">
+                                                                <a th:href="@{'/usuario/perfil/'+${usuario.id}}" target="_blank" class="text-verPerfil font-weight-bolder ml-3">Ver Perfil</a>
+                                                            </div>
+                                                        </div>
+                                                         <div th:if="${mensajeSolicitud!='' && mensajeSolicitud!=null}" class="d-flex mt-2 flex-column">
+                                                            <a class="text-dark font-weight-bold mb-lg-0 mb-2 ml-5">Desea unirse a tu proyecto por:</a>
+                                                            <div class="cont-etiquetas d-flex align-items-center mr-10 pd-top-5"  style="padding-top: 10px">
+                                                                <div class="mx-2">
+                                                                    <span th:text="${mensajeSolicitud}">Deseo unirme debido a que quiero aprender a manejar estas herramientas y aprender más</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex mt-2 flex-column">
+                                                            <a class="text-dark font-weight-bold mb-lg-0 mb-2 ml-5">Rol</a>
+                                                            <div class="cont-etiquetas d-flex align-items-center mr-10 pd-top-5"  style="padding-top: 10px">
+                                                                <div class="mx-2">
+                                                                    <span class="btn etiqueta-mini btn-outline-info text-uppercase font-weight-bold" th:text="${usuario.rol.getValue()}"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex mt-2 flex-column">
+                                                            <a class="text-dark font-weight-bold mb-lg-0 mb-2 ml-5">Lenguajes</a>
+                                                            <div class="cont-etiquetas d-flex align-items-center mr-10 pd-top-5"  style="padding-top: 10px">
+                                                                <div class="mx-2" th:each="leng:${usuario.lenguajes.entrySet()}">
+                                                                    <span class="btn etiqueta-mini btn-outline-warning text-uppercase font-weight-bold" th:text="${lenguajesEnum.valueOf(leng.getKey()).getValue()}"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>   
+
+                                            </div>
+                                            <div class="reputacion">
+                                                <div class="d-flex align-items-center flex-wrap mt-8">
+                                                    <!--begin::Item-->
+                                                    <div class="d-flex align-items-center justify-content-center flex-lg-fill mr-2 mb-2">
+                                                        <span class="mr-4">
+                                                            <i class="far fa-smile-beam display-4 text-muted font-weight-bold"></i>
+                                                        </span>
+                                                        <div class="d-flex flex-column text-dark-75">
+                                                            <span class="font-weight-bolder font-size-sm">Colaborador</span>
+                                                            <span class="text-dark-75 font-weight-bold">
+                                                                <span class="font-weight-bolder font-size-h5" th:text="${usuario.reputacionAlta==null?'0':usuario.reputacionMedia}"></span> votos</span>
+                                                        </div>
+                                                    </div>
+                                                    <!--end::Item-->
+                                                    <!--begin::Item-->
+                                                    <div class="d-flex align-items-center justify-content-center flex-lg-fill mr-2 mb-2">
+                                                        <span class="mr-4">
+                                                            <i class="far fa-meh display-4 text-muted font-weight-bold"></i>
+                                                        </span>
+                                                        <div class="d-flex flex-column text-dark-75">
+                                                            <span class="font-weight-bolder font-size-sm">Neutral</span>
+                                                            <span class="text-dark-75 font-weight-bold">
+                                                                <span class="font-weight-bolder font-size-h5" th:text="${usuario.reputacionMedia==null?'0':usuario.reputacionMedia}"></span> votos</span>
+                                                        </div>
+                                                    </div>
+                                                    <!--end::Item-->
+                                                    <!--begin::Item-->
+                                                    <div class="d-flex align-items-center justify-content-center flex-lg-fill mr-2 mb-2">
+                                                        <span class="mr-4">
+                                                            <i class="far fa-frown display-4 text-muted font-weight-bold"></i>
+                                                        </span>
+                                                        <div class="d-flex flex-column text-dark-75">
+                                                            <span class="font-weight-bolder font-size-sm">Decepcionante</span>
+                                                            <span class="text-dark-75 font-weight-bold">
+                                                                <span class="font-weight-bolder font-size-h5" th:text="${usuario.reputacionBaja==null?'0':usuario.reputacionMedia}"></span> votos</span>
+                                                        </div>
+
+                                                    </div>
+                                                    <!--end::Item-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-between">
+                                            <a th:href="@{'proyecto/rechazar/'+${proyecto.id}+'/'+${usuario.id}}" class="btn btn-outline-secondary font-weight-bold" id='rechazar'>Rechazar</a>
+                                            <a th:href="@{'proyecto/aceptar/'+${proyecto.id}+'/'+${usuario.id}}" class="btn btn-light-primary font-weight-bold">Aceptar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Card-->
+                            </div>
+                            <!--end::Container-->
+                        </div>
+                        <!--end::Entry-->
+                    </div>
+                    <!--end::Content-->
+                    <!--begin::Footer-->
+                    <div th:replace="layout/footer::footer"></div>
+                    <!--end::Footer-->
+                </div>
+                <!--end::Wrapper-->
+            </div>
+            <!--end::Page-->
+        </div>
+        <!--end::Main-->
+
+        <!-- begin::User Panel-->
+        <div th:replace="layout/user-panel::user-panel"></div>
+        <!-- end::User Panel-->
+
+        <!--begin::QuickPanel el del costado del user-->
+        <div th:replace="layout/quick-panel::quickPanel"></div>
+        <!--end::QuickPanel-->
+
+        <!--begin::Scrolltop-->
+        <div th:replace="layout/scrollTop::scrollTop"></div>
+        <!--end::Scrolltop-->
+
+        <!--end::Global Theme Bundle-->
+    <scripts th:replace="layout/scripts::scripts"></scripts>
+    <!--begin::Page Vendors(used by this page)-->
+    <script src="assets/js/proyecto/proyectoSolicitud.js"></script>
+    <!--end::Page Vendors-->
+</body>
+<!--end::Body-->
+</html>

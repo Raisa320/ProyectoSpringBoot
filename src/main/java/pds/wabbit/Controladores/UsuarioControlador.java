@@ -72,6 +72,7 @@ public class UsuarioControlador {
             perfil = usuarioServicio.buscarUsuarioPorId(idUser);
         } else {
             perfil = (Usuario) session.getAttribute("usuariosession");
+            perfil = usuarioServicio.buscarUsuarioPorId(perfil.getId());
         }
         modelo.addAttribute("temasEnum", Temas.class);
         modelo.addAttribute("lenguajesEnum", Lenguajes.class);
@@ -240,6 +241,26 @@ public class UsuarioControlador {
     public String agregarObsevacionAjax(@RequestParam Map<String, Object> params) throws JSONException, ErrorServicio {
 
         return usuarioServicio.modificarPassword(params);
+    }
+    
+    @PostMapping("/votos")
+    public String calificacion(@RequestParam Map<String, Object> params, RedirectAttributes redirectAttrs, HttpSession session) {
+        try {
+            if (params.containsKey("proyectoId")) {
+                usuarioServicio.calificaciones(params);
+                redirectAttrs
+                        .addFlashAttribute("mensaje", "Usuarios calificados con éxito")
+                        .addFlashAttribute("clase", "success");
+                return "redirect:/proyecto/ver-proyecto/" + params.get("proyectoId");
+            } else {
+                return "redirect:/escritorio";
+            }
+        } catch (ErrorServicio ex) {
+            redirectAttrs
+                        .addFlashAttribute("mensaje", ex.getMessage())
+                        .addFlashAttribute("clase", "danger");
+                return "redirect:/proyecto/ver-proyecto/" + params.get("proyectoId");
+        }
     }
 
 }

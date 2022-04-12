@@ -3,8 +3,9 @@ $(document).on("click", "#unirse", function (event) {
     var urlVincular = this.href;
     Swal.fire({
         title: 'Atención',
-        text: "¿Por qué deseas unirte al proyecto?",
+        html: "¿Deseas unirte al proyecto? <br>Puedes enviar un mensaje adicional mencionando la razón de esta solicitud.</br>",
         input: 'text',
+        inputPlaceholder: "(* Opcional)",
         inputAttributes: {
             autocapitalize: 'off'
         },
@@ -13,7 +14,12 @@ $(document).on("click", "#unirse", function (event) {
         confirmButtonText: 'Sí',
         cancelButtonText: 'No'
     }).then(function (result) {
-        if (result.value) {
+        
+        if (result.value==="" || result.value) {
+            if(result.value){
+                urlVincular=urlVincular+"/"+result.value;
+            }
+            //console.log(urlVincular)
             window.location = urlVincular;
         }
     });

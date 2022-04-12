@@ -79,4 +79,9 @@ public class Usuario {
     
     private boolean cuentaVerificada;
     
+    @Column
+    @ElementCollection(targetClass = String.class)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<String> proyectosGuardados;
+    
 }
