@@ -69,5 +69,28 @@ public class Proyecto {
     @Enumerated(EnumType.STRING)
     private EstadosProyecto estadosProyecto;
     
+    public String verificarParticipante(String idUsuario){
+        String unido="false";
+        if(this.participantes.stream().filter(user->user.getId().equals(idUsuario)).findFirst().isPresent()){
+           unido="true";
+        }
+        return unido;
+    }
+    
+    public String verificarPostulado(List<String> listado){
+        String postula="false";
+        if (listado.stream().filter(idP->idP.equalsIgnoreCase(this.id)).findFirst().isPresent()) {
+            postula="true";
+        }
+        return postula;
+    }
+    
+    public String verificarVoto(List<String> listado){
+        String voto="false";
+        if (listado.stream().filter(idP->idP.equalsIgnoreCase(this.id)).findFirst().isPresent()) {
+            voto="true";
+        }
+        return voto;
+    }
     
 }
