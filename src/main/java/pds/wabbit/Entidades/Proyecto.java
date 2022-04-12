@@ -66,6 +66,8 @@ public class Proyecto {
     
     private Integer cupos;
     
+    private Integer votos=0;
+    
     @Enumerated(EnumType.STRING)
     private EstadosProyecto estadosProyecto;
     

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
@@ -253,6 +254,42 @@ public class UsuarioServicio implements UserDetailsService {
         }
         results.put(objetoData);
         return results.toString();
+    }
+    
+    public List<String> listadoProyectosGuardados(String id){
+        Usuario user=usuarioRepositorio.findById(id).get();
+        return user.getProyectosGuardados();
+    }
+    
+    @Transactional
+    public void calificaciones(Map<String, Object> params) throws ErrorServicio{
+        System.out.println("AQUI EN MAP");
+        for (Map.Entry<String, Object> data : params.entrySet()) {
+            System.out.println("DATA:"+data.getKey());
+            if (!data.getKey().equalsIgnoreCase("proyectoId")) {
+                Optional<Usuario> respuesta=usuarioRepositorio.findById(data.getKey());
+                if (respuesta.isPresent()) {
+                    Usuario user = respuesta.get();
+                    Integer sum;
+                    if (data.getValue().toString().equalsIgnoreCase("colaborador")) {
+                        sum= user.getReputacionAlta()==null?0:user.getReputacionAlta();
+                        sum=sum+1;
+                        user.setReputacionAlta(sum);
+                    }else if(data.getValue().toString().equalsIgnoreCase("decepcionante")){
+                        sum= user.getReputacionBaja()==null?0:user.getReputacionBaja();
+                        sum=sum+1;
+                        user.setReputacionBaja(sum);
+                    }else if(data.getValue().toString().equalsIgnoreCase("neutral")){
+                        sum= user.getReputacionMedia()==null?0:user.getReputacionMedia();
+                        sum=sum+1;
+                        user.setReputacionMedia(sum);
+                    }
+                    usuarioRepositorio.save(user);
+                }else{
+                    throw new ErrorServicio("ID de usuario incorrecto no se guardó nada.");
+                }
+            }
+        }
     }
 
     //ES PARA EL LOGIN IDENTIFICARSE NECESITA UN IMPLEMENTS ARRIBA

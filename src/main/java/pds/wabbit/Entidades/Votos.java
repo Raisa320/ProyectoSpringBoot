@@ -1,4 +1,8 @@
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package pds.wabbit.Entidades;
 
 import javax.persistence.Entity;
@@ -10,7 +14,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Data
 @Entity
-public class Postulacion {
+public class Votos {
     
     @Id
     @GeneratedValue(generator = "uuid")
@@ -23,7 +27,10 @@ public class Postulacion {
     @ManyToOne
     private Proyecto proyecto;
     
-    private String mensaje;
-    
+//    @ManyToOne
+//    private Foro pregunta;
+//    
+//    @ManyToOne
+//    private Respuesta respuesta;
     
 }
