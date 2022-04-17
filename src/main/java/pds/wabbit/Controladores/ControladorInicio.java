@@ -66,19 +66,19 @@ public class ControladorInicio {
         return false;
     }
 
-//    @GetMapping("/")
-//    public String inicio(ModelMap modelo,  HttpSession session) {
-//        try {
-//            modelo.addAttribute("titulo", "Wabbi");
-//            return "landing.html";   
-//        } catch (Exception e) {
-//            System.out.println("EXCEPCION:" +e);
-//            return "redirect:/logout";
-//        }
-//        
-//    }
-    @PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')")
     @GetMapping("/")
+    public String inicio(ModelMap modelo, HttpSession session) {
+        try {
+            modelo.addAttribute("titulo", "Wabbi");
+            return "landing.html";
+        } catch (Exception e) {
+            System.out.println("EXCEPCION:" + e);
+            return "redirect:/logout";
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')")
+    @GetMapping("/escritorio")
     public String escritorio(ModelMap modelo, HttpSession session) {
         try {
             modelo.addAttribute("titulo", "Escritorio");
