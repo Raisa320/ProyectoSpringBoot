@@ -111,7 +111,7 @@ public class ProyectoControlador {
             redirectAttrs
                     .addFlashAttribute("mensaje", "Error en el id de usuario")
                     .addFlashAttribute("clase", "danger");
-            return "redirect:/";
+            return "redirect:/escritorio";
         }
     }
 
@@ -134,13 +134,13 @@ public class ProyectoControlador {
                     .addFlashAttribute("proyectoPublicado", proyect)
                     .addFlashAttribute("mensaje", "Proyecto Publicado correctamente")
                     .addFlashAttribute("clase", "success");
-            return "redirect:/";
+            return "redirect:/escritorio";
         } catch (Exception e) {
             System.out.println("ERROR:" + e);
             redirectAttrs
                     .addFlashAttribute("mensaje", e.getMessage())
                     .addFlashAttribute("clase", "danger");
-            return "redirect:/";
+            return "redirect:/escritorio";
         }
     }
 
@@ -231,20 +231,20 @@ public class ProyectoControlador {
                 return "redirect:/proyecto/filter?nombreP=" + params.get("nombreP").toString() + "&temaUrl=" + params.get("temaUrl").toString() + "&listaTema=" + params.get("listaTema").toString();
             }
         }
-        return "redirect:/";
+        return "redirect:/escritorio";
     }
 
     @GetMapping("/filter")
     public String buscarListado(@RequestParam Map<String, Object> params, Model modelo, HttpSession session) {
         if (!params.isEmpty() && params.size() >= 3) {
             if (params.get("nombreP") == "" || params.get("temaUrl") == "" || params.get("listaTema") == "") {
-                return "redirect:/";
+                return "redirect:/escritorio";
             }
             Usuario user = (Usuario) session.getAttribute("usuariosession");
             int page = params.get("page") != null ? Integer.valueOf(params.get("page").toString()) - 1 : 0;
             PageRequest pageRequest = PageRequest.of(page, 12);
             Page<Proyecto> pageProyectos = Page.empty(pageRequest);
-            String retorna = "redirect:/";
+            String retorna = "redirect:/escritorio";
             if (params.get("listaTema").toString().equals("temas")) {
                 pageProyectos = proyectoServicio.filtroTema(params.get("nombreP").toString(), Temas.valueOf(params.get("temaUrl").toString()), pageRequest);
                 baseModeloListar("Temas Proyectos", "temas", params.get("temaUrl").toString(), user, modelo);
@@ -266,7 +266,7 @@ public class ProyectoControlador {
             modelo.addAttribute("url", url);
             return retorna;
         }
-        return "redirect:/";
+        return "redirect:/escritorio";
     }
 
     @GetMapping("/guardados")
@@ -402,7 +402,7 @@ public class ProyectoControlador {
         redirectAttrs
                 .addFlashAttribute("mensaje", "Solicitud Rechazada y eliminada.")
                 .addFlashAttribute("clase", "danger");
-        return "redirect:/";
+        return "redirect:/escritorio";
     }
 
     @GetMapping("/aceptar/{proyectoId}/{usuarioId}")
@@ -422,11 +422,11 @@ public class ProyectoControlador {
             redirectAttrs
                     .addFlashAttribute("mensaje", "Usuario agregado al proyecto.")
                     .addFlashAttribute("clase", "success");
-            return "redirect:/";
+            return "redirect:/escritorio";
         } catch (MessagingException | IOException | TemplateException ex) {
             Logger.getLogger(ProyectoControlador.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "redirect:/";
+        return "redirect:/escritorio";
     }
 
     @GetMapping("/calificar/{idProyecto}")
@@ -434,7 +434,7 @@ public class ProyectoControlador {
         modelo.addAttribute("titulo", "Proyecto");
         Proyecto proyecto = proyectoServicio.buscarProyectoPorId(idProyecto);
         if (proyecto.getEstadosProyecto().name().equalsIgnoreCase("Finalizado")) {
-            return "redirect:/";
+            return "redirect:/escritorio";
         } else {
             //PRIMERO FINALIZAR EL PROYECTO DE PASO :v
             proyectoServicio.finalizar(proyecto);
@@ -478,7 +478,7 @@ public class ProyectoControlador {
         redirectAttrs
                 .addFlashAttribute("mensaje", "La solicitud ya no está disponible.")
                 .addFlashAttribute("clase", "danger");
-        return "redirect:/";
+        return "redirect:/escritorio";
     }
     
     @GetMapping("/misSolicitudes")
@@ -532,7 +532,7 @@ public class ProyectoControlador {
             redirectAttrs
                     .addFlashAttribute("mensaje", "Error en el id de usuario")
                     .addFlashAttribute("clase", "danger");
-            return "redirect:/";
+            return "redirect:/escritorio";
         }
     }
     
