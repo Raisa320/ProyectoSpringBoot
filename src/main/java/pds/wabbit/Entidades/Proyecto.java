@@ -71,6 +71,8 @@ public class Proyecto {
     @Enumerated(EnumType.STRING)
     private EstadosProyecto estadosProyecto;
     
+    private String url;
+    
     public String verificarParticipante(String idUsuario){
         String unido="false";
         if(this.participantes.stream().filter(user->user.getId().equals(idUsuario)).findFirst().isPresent()){

@@ -31,18 +31,27 @@ $(document).on("click", ".guardar", function(event){
     });
 });
 $(document).on("click", ".unirse", function(event){
-
     event.preventDefault();
     var urlVincular = this.href;
     Swal.fire({
         title: 'Atención',
-        text: "¿Estás seguro que deseas solicitar unirte?",
+        html: "¿Deseas unirte al proyecto? <br>Puedes enviar un mensaje adicional mencionando la razón de esta solicitud.</br>",
+        input: 'text',
+        inputPlaceholder: "(* Opcional)",
+        inputAttributes: {
+            autocapitalize: 'off'
+        },
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Sí',
         cancelButtonText: 'No'
     }).then(function (result) {
-        if (result.value) {
+
+        if (result.value === "" || result.value) {
+            if (result.value) {
+                urlVincular = urlVincular + "/" + result.value;
+            }
+            //console.log(urlVincular)
             window.location = urlVincular;
         }
     });

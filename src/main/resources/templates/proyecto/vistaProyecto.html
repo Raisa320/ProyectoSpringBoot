@@ -3,6 +3,9 @@
     <!--begin::Head-->
     <head>
         <link th:replace="layout/head::head" th:remove="tag">
+        <!--begin::Page Custom Styles(used by this page)-->
+        <link href="assets/plugins/custom/kanban/kanban.bundle.css" rel="stylesheet" type="text/css" />
+        <!--end::Page Custom Styles-->
     </head>
     <!--end::Head-->
     <!--begin::Body-->
@@ -150,8 +153,9 @@
                                                                 </span>
                                                             </div>
                                                         </div>
-
+                                                        
                                                     </div>
+                                                    <div th:if="${proyecto.url!=null && proyecto.url!=''}" class="font-weight-bold mb-2 mt-5">Repositorio Proyecto: <a th:href="@{${proyecto.url}}" target="_blank" th:text="${proyecto.url}"></a></div>
                                                     <div th:if="${unido=='true'}" class="text-muted font-weight-bold mr-lg-8 mr-5 mb-lg-0 mt-2">
                                                         <p class="mb-0">*Tú ya formas parte de este proyecto.</p>
                                                     </div>
@@ -204,7 +208,7 @@
                                                     <div th:each="user,iterador:${proyecto.participantes}" th:if="${iterador.index<5}" class="symbol symbol-30 symbol-circle symbol-light-success" data-toggle="tooltip" th:title="${user.nombre+' '+user.apellido}">
                                                         <span th:if="${user.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${user.nombre.substring(0,1)}"></span>
                                                         <img th:if="${user.avatar!=null}" th:src="${'assets/media/svg/avatars/'+user.avatar+'.svg'}" />
-                                                      
+
                                                     </div>
                                                     <div th:if="${proyecto.participantes.size()<5}" class="symbol symbol-30 symbol-circle symbol-light">
                                                         <a th:href="@{'proyecto/participantes/'+${proyecto.id}}" class="symbol-label font-weight-bold" th:text="'Ver'"></a>
@@ -220,75 +224,178 @@
                                     </div>
                                 </div>
                                 <!--end::Card-->
-                                <!--begin: CHAT-->
-<!--                                <div th:if="${(unido=='true' || session.usuariosession.id==proyecto.usuarioCreador.id) && proyecto.participantes.size()>0 && proyecto.estadosProyecto.name()!='Finalizado'}" class="d-flex flex-row mr-lg-7">
-                                    begin::Content
-                                    <div class="flex-row-fluid ml-lg-7" id="kt_chat_content">
-                                        begin::Card
-                                        <div class="card card-custom">
-                                            begin::Header
-                                            <div class="card-header align-items-center px-4 py-3">
-                                                <div class="text-left flex-grow-1">
-                                                </div>
-                                                <div class="text-center text-center">
-                                                    <div class="symbol-group symbol-hover justify-content-center">
-                                                        <div class="symbol symbol-30 symbol-circle symbol-light-success" data-toggle="tooltip" th:title="${proyecto.usuarioCreador.nombre+' '+proyecto.usuarioCreador.apellido}">
-                                                            <span th:if="${proyecto.usuarioCreador.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${proyecto.usuarioCreador.nombre.substring(0,1)}"></span>
-                                                            <img th:if="${proyecto.usuarioCreador.avatar!=null}" th:src="${'assets/media/svg/avatars/'+proyecto.usuarioCreador.avatar+'.svg'}" />
-                                                        </div>
-                                                        <div th:each="user,iterador:${proyecto.participantes}" th:if="${iterador.index<5}" class="symbol symbol-30 symbol-circle symbol-light-success" data-toggle="tooltip" th:title="${user.nombre+' '+user.apellido}">
-                                                            <span th:if="${user.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${user.nombre.substring(0,1)}"></span>
-                                                            <img th:if="${user.avatar!=null}" th:src="${'assets/media/svg/avatars/'+user.avatar+'.svg'}" />
-                                                        </div>
-                                                        <div th:if="${proyecto.participantes.size()>5}" class="symbol symbol-30 symbol-circle symbol-light">
-                                                            <a th:href="@{'proyecto/participantes/'+${proyecto.id}}" class="symbol-label font-weight-bold" th:text="'+'+${proyecto.participantes.size()-5}"></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-right flex-grow-1">
-                                                    begin::Dropdown Menu
-                                                    end::Dropdown Menu
-                                                </div>
+                                <div class="modal fade" id="exampleModalSizeSm" tabindex="-1" role="dialog" aria-labelledby="exampleModalSizeSm" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Modal Title</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <i aria-hidden="true" class="ki ki-close"></i>
+                                                </button>
                                             </div>
-                                            end::Header
-                                            begin::Body
-                                            <div class="card-body">
-                                                begin::Scroll
-                                                <div class="scroll scroll-pull h-250px" data-mobile-height="350" id="scrollear">
-                                                    begin::Messages
-                                                    <div class="messages" id="messageCuerpo">
-                                                        
-                                                    </div>
-                                                    end::Messages
-                                                </div>
-                                                end::Scroll
+                                            <div class="modal-body">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary font-weight-bold">Save changes</button>
                                             </div>
-                                            end::Body
-                                            begin::Footer
-                                            <div class="card-footer align-items-center">
-                                                begin::Compose
-                                                <form id="chat-ux">
-                                                    <input type="hidden" id="idUser" name="idUser" th:value="${session.usuariosession.id}">
-                                                    <input type="hidden" id="username" name="username" th:value="${session.usuariosession.apellido+' '+session.usuariosession.nombre}">
-                                                    <input type="hidden" id="proyctId" name="proyctId" th:value="${proyecto.id}">
-                                                    <textarea class="form-control border-0 p-0" id="message" rows="2" placeholder="Escribe un mensaje..."></textarea>
-                                                    <div class="d-flex align-items-center justify-content-between mt-5">
-                                                        <div class="mr-3">
-                                                        </div>
-                                                        <div>
-                                                            <button type="button" class="btn btn-primary btn-md text-uppercase font-weight-bold chat-send py-2 px-6" id="send">Enviar</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                                begin::Compose
-                                            </div>
-                                            end::Footer
                                         </div>
-                                        end::Card
                                     </div>
-                                    end::Content
-                                </div>-->
-                                <!--end::Chat-->
+                                </div>
+                                <!--begin: ADMINISTRACION PROYECTO-->
+                                <!--begin::Card-->
+                                <div th:if="${(unido=='true' || session.usuariosession.id==proyecto.usuarioCreador.id) && proyecto.participantes.size()>0 && proyecto.estadosProyecto.name()!='Finalizado'}" class="card card-custom  mr-lg-7 ml-lg-7">
+                                    <!--begin::Header-->
+                                    <div class="card-header card-header-tabs-line">
+                                        <div class="card-toolbar">
+                                            <ul class="nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-tabs-bold nav-tabs-line-3x" role="tablist">
+                                                <li class="nav-item mr-3">
+                                                    <a class="nav-link active" data-toggle="tab" href="#kt_apps_projects_view_tab_2">
+                                                        <span class="nav-icon mr-2">
+                                                            <span class="svg-icon mr-3">
+                                                                <!--begin::Svg Icon | path:assets/media/svg/icons/Communication/Chat-check.svg-->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                <rect x="0" y="0" width="24" height="24" />
+                                                                <path d="M4.875,20.75 C4.63541667,20.75 4.39583333,20.6541667 4.20416667,20.4625 L2.2875,18.5458333 C1.90416667,18.1625 1.90416667,17.5875 2.2875,17.2041667 C2.67083333,16.8208333 3.29375,16.8208333 3.62916667,17.2041667 L4.875,18.45 L8.0375,15.2875 C8.42083333,14.9041667 8.99583333,14.9041667 9.37916667,15.2875 C9.7625,15.6708333 9.7625,16.2458333 9.37916667,16.6291667 L5.54583333,20.4625 C5.35416667,20.6541667 5.11458333,20.75 4.875,20.75 Z" fill="#000000" fill-rule="nonzero" opacity="0.3" />
+                                                                <path d="M2,11.8650466 L2,6 C2,4.34314575 3.34314575,3 5,3 L19,3 C20.6568542,3 22,4.34314575 22,6 L22,15 C22,15.0032706 21.9999948,15.0065399 21.9999843,15.009808 L22.0249378,15 L22.0249378,19.5857864 C22.0249378,20.1380712 21.5772226,20.5857864 21.0249378,20.5857864 C20.7597213,20.5857864 20.5053674,20.4804296 20.317831,20.2928932 L18.0249378,18 L12.9835977,18 C12.7263047,14.0909841 9.47412135,11 5.5,11 C4.23590829,11 3.04485894,11.3127315 2,11.8650466 Z M6,7 C5.44771525,7 5,7.44771525 5,8 C5,8.55228475 5.44771525,9 6,9 L15,9 C15.5522847,9 16,8.55228475 16,8 C16,7.44771525 15.5522847,7 15,7 L6,7 Z" fill="#000000" />
+                                                                </g>
+                                                                </svg>
+                                                                <!--end::Svg Icon-->
+                                                            </span>
+                                                        </span>
+                                                        <span class="nav-text font-weight-bold">Recursos</span>
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item mr-3">
+                                                    <a class="nav-link" data-toggle="tab" href="#kt_apps_projects_view_tab_3">
+                                                        <span class="nav-icon mr-2">
+                                                            <span class="svg-icon mr-3">
+                                                                <!--begin::Svg Icon | path:assets/media/svg/icons/Devices/Display1.svg-->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                <rect x="0" y="0" width="24" height="24" />
+                                                                <path d="M11,20 L11,17 C11,16.4477153 11.4477153,16 12,16 C12.5522847,16 13,16.4477153 13,17 L13,20 L15.5,20 C15.7761424,20 16,20.2238576 16,20.5 C16,20.7761424 15.7761424,21 15.5,21 L8.5,21 C8.22385763,21 8,20.7761424 8,20.5 C8,20.2238576 8.22385763,20 8.5,20 L11,20 Z" fill="#000000" opacity="0.3" />
+                                                                <path d="M3,5 L21,5 C21.5522847,5 22,5.44771525 22,6 L22,16 C22,16.5522847 21.5522847,17 21,17 L3,17 C2.44771525,17 2,16.5522847 2,16 L2,6 C2,5.44771525 2.44771525,5 3,5 Z M4.5,8 C4.22385763,8 4,8.22385763 4,8.5 C4,8.77614237 4.22385763,9 4.5,9 L13.5,9 C13.7761424,9 14,8.77614237 14,8.5 C14,8.22385763 13.7761424,8 13.5,8 L4.5,8 Z M4.5,10 C4.22385763,10 4,10.2238576 4,10.5 C4,10.7761424 4.22385763,11 4.5,11 L7.5,11 C7.77614237,11 8,10.7761424 8,10.5 C8,10.2238576 7.77614237,10 7.5,10 L4.5,10 Z" fill="#000000" />
+                                                                </g>
+                                                                </svg>
+                                                                <!--end::Svg Icon-->
+                                                            </span>
+                                                        </span>
+                                                        <span class="nav-text font-weight-bold">Tablero</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <!--end::Header-->
+                                    <!--begin::Body-->
+                                    <div class="card-body">
+                                        <div class="tab-content pt-5">
+                                            <!--begin::Tab Content-->
+                                            <div class="tab-pane active" id="kt_apps_projects_view_tab_2" role="tabpanel">
+                                                <!--begin::Actions-->
+                                                <div class="d-flex align-items-center my-2">
+                                                    <span class="btn btn-light-success btn-sm text-uppercase font-weight-bolder" data-toggle="tooltip" title="Previose page">New Task</span>
+                                                </div>
+                                                <!--end::Actions-->
+                                                <!--begin::Responsive container-->
+                                                <div class="table-responsive">
+                                                    <!--begin::Items-->
+                                                    <div class="list list-hover min-w-500px" data-inbox="list">
+                                                        <!--begin::Item-->
+                                                        <div class="d-flex align-items-start list-item card-spacer-x py-4" data-inbox="message">
+                                                            <!--begin::Toolbar-->
+                                                            <div class="d-flex align-items-center">
+                                                                <!--begin::Actions-->
+                                                                <div class="d-flex align-items-center mr-3" data-inbox="actions">
+                                                                    <!--begin::Buttons-->
+                                                                    <a href="#" class="btn btn-icon btn-xs text-hover-warning" data-toggle="tooltip" data-placement="right" title="Marcar como importante">
+                                                                        <i class="flaticon-add-label-button text-muted"></i>
+                                                                    </a>
+                                                                    <!--end::Buttons-->
+                                                                </div>
+                                                                <!--end::Actions-->
+                                                            </div>
+                                                            <!--end::Toolbar-->
+                                                            <!--begin::Info-->
+                                                            <div class="flex-grow-1 mt-1 mr-2" data-toggle="view">
+                                                                <!--begin::Title-->
+                                                                <div class="font-weight-bolder mr-2">Digital PPV Customer Confirmation</div>
+                                                                <!--end::Title-->
+                                                                <!--begin::Labels-->
+                                                                <div class="mt-2">
+                                                                    <span class="label label-light-primary font-weight-bold label-inline">inbox</span>
+                                                                </div>
+                                                                <!--end::Labels-->
+                                                            </div>
+                                                            <!--end::Info-->
+                                                            <!--begin::Details-->
+                                                            <div class="d-flex align-items-center justify-content-end flex-wrap" data-toggle="view">
+                                                                <!--begin::Datetime-->
+                                                                <div class="font-weight-bolder" data-toggle="view">8:30 PM</div>
+                                                                <!--end::Datetime-->
+                                                                <!--begin::User Photo-->
+                                                                <span class="symbol symbol-30 ml-3">
+                                                                    <!--                                                                    <div th:each="user,iterador:${proyecto.participantes}" th:if="${iterador.index<5}" class="symbol symbol-30 symbol-circle symbol-light-success" data-toggle="tooltip" th:title="${user.nombre+' '+user.apellido}">
+                                                                                                                                                                <span th:if="${user.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${user.nombre.substring(0,1)}"></span>
+                                                                                                                                                                <img th:if="${user.avatar!=null}" th:src="${'assets/media/svg/avatars/'+user.avatar+'.svg'}" />
+                                                                                                                                                            </div>-->
+                                                                    <span class="symbol-label" style="background-image: url('assets/media/users/100_13.jpg')"></span>
+                                                                </span>
+                                                                <!--end::User Photo-->
+                                                            </div>
+                                                            <!--end::Details-->
+                                                        </div>
+                                                        <!--end::Item-->
+                                                    </div>
+                                                    <!--end::Items-->
+                                                </div>
+                                                <!--end::Responsive container-->
+                                                <!--begin::Pagination-->
+                                                <div class="d-flex align-items-center my-2 my-6 card-spacer-x justify-content-end">
+                                                    <div class="d-flex align-items-center mr-2" data-toggle="tooltip" title="Records per page">
+                                                        <span class="text-muted font-weight-bold mr-2" data-toggle="dropdown">1 - 50 of 235</span>
+                                                        <div class="dropdown-menu dropdown-menu-right p-0 m-0 dropdown-menu-sm">
+                                                            <ul class="navi py-3">
+                                                                <li class="navi-item">
+                                                                    <a href="#" class="navi-link">
+                                                                        <span class="navi-text">20 per page</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="navi-item">
+                                                                    <a href="#" class="navi-link active">
+                                                                        <span class="navi-text">50 par page</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="navi-item">
+                                                                    <a href="#" class="navi-link">
+                                                                        <span class="navi-text">100 per page</span>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <span class="btn btn-default btn-icon btn-sm mr-2" data-toggle="tooltip" title="Previose page">
+                                                        <i class="ki ki-bold-arrow-back icon-sm"></i>
+                                                    </span>
+                                                    <span class="btn btn-default btn-icon btn-sm" data-toggle="tooltip" title="Next page">
+                                                        <i class="ki ki-bold-arrow-next icon-sm"></i>
+                                                    </span>
+                                                </div>
+                                                <!--end::Pagination-->
+                                            </div>
+                                            <!--end::Tab Content-->
+                                            <!--begin::Tab Content-->
+                                            <div class="tab-pane" id="kt_apps_projects_view_tab_3" role="tabpanel">
+                                                <div id="kt_kanban_3"></div>
+                                            </div>
+                                            <!--end::Tab Content-->
+                                        </div>
+                                    </div>
+                                    <!--end::Body-->
+                                </div>
+                                <!--end::Card-->
+                                <!--end::ADMINISTRACION PROYECTO-->
                             </div>
                             <!--end::Container-->
                         </div>
@@ -320,12 +427,11 @@
         <!--end::Global Theme Bundle-->
     <scripts th:replace="layout/scripts::scripts"></scripts>
     <!--begin::Page Vendors(used by this page)-->
-    <script src="assets/js/sockjs.min.js"></script>
-    <script src="assets/js/stomp.min.js"></script>
-    <script src="assets/js/proyecto/chatSocket.js"></script>
-    <script src="assets/js/widgets/chat.js"></script>
     <script src="assets/js/proyecto/proyectoUnirse.js"></script>
-    
+    <!--begin::Page Scripts(used by this page)-->
+    <script src="assets/plugins/custom/kanban/kanban.bundle.js"></script>
+    <script src="assets/js/pages/miscellaneous/kanban-board.js"></script>
+    <!--end::Page Scripts-->
     <!--end::Page Vendors-->
 </body>
 <!--end::Body-->

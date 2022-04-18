@@ -395,6 +395,12 @@ public class ProyectoControlador {
         proyectoServicio.finalizar(proyecto);
         return "redirect:/proyecto/ver-proyecto/" + idProyecto;
     }
+    
+    @RequestMapping(value = "/finalizarProyecto", method = RequestMethod.POST)
+    @ResponseBody
+    public String finalizarProyectoUrl(@RequestParam String id,@RequestParam String urlFinal) throws JSONException, ErrorServicio {
+        return proyectoServicio.finalizarUrlProyecto(id, urlFinal);
+    }
 
     @GetMapping("/rechazar/{proyectoId}/{usuarioId}")
     public String rechazar(Model modelo, @PathVariable String proyectoId, @PathVariable String usuarioId, RedirectAttributes redirectAttrs) {

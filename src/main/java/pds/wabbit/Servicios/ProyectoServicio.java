@@ -306,6 +306,17 @@ public class ProyectoServicio {
         results.put(objetoData);
         return results.toString();
     }
+    
+    public String finalizarUrlProyecto(String idProyecto, String urlF)throws JSONException, ErrorServicio{
+        Proyecto proyecto = buscarProyectoPorId(idProyecto);
+        proyecto.setUrl(urlF);
+        proyectoRepositorio.save(proyecto);
+        JSONArray results = new JSONArray();
+        JSONObject objetoData = new JSONObject();
+        objetoData.put("status", "ok");
+        results.put(objetoData);
+        return results.toString();
+    }
 
     @Transactional
     public void finalizar(Proyecto proyecto) {
