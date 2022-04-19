@@ -313,11 +313,11 @@
                                                         <span class="nav-text font-weight-bold">Recursos</span>
                                                     </a>
                                                 </li>
-<!--                                                <li class="nav-item mr-3">
+                                                <li class="nav-item mr-3">
                                                     <a class="nav-link" data-toggle="tab" href="#kt_apps_projects_view_tab_3">
                                                         <span class="nav-icon mr-2">
                                                             <span class="svg-icon mr-3">
-                                                                begin::Svg Icon | path:assets/media/svg/icons/Devices/Display1.svg
+                                                                <!--begin::Svg Icon | path:assets/media/svg/icons/Devices/Display1.svg-->
                                                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
                                                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                                                 <rect x="0" y="0" width="24" height="24" />
@@ -325,12 +325,12 @@
                                                                 <path d="M3,5 L21,5 C21.5522847,5 22,5.44771525 22,6 L22,16 C22,16.5522847 21.5522847,17 21,17 L3,17 C2.44771525,17 2,16.5522847 2,16 L2,6 C2,5.44771525 2.44771525,5 3,5 Z M4.5,8 C4.22385763,8 4,8.22385763 4,8.5 C4,8.77614237 4.22385763,9 4.5,9 L13.5,9 C13.7761424,9 14,8.77614237 14,8.5 C14,8.22385763 13.7761424,8 13.5,8 L4.5,8 Z M4.5,10 C4.22385763,10 4,10.2238576 4,10.5 C4,10.7761424 4.22385763,11 4.5,11 L7.5,11 C7.77614237,11 8,10.7761424 8,10.5 C8,10.2238576 7.77614237,10 7.5,10 L4.5,10 Z" fill="#000000" />
                                                                 </g>
                                                                 </svg>
-                                                                end::Svg Icon
+                                                                <!--end::Svg Icon-->
                                                             </span>
                                                         </span>
                                                         <span class="nav-text font-weight-bold">Tablero</span>
                                                     </a>
-                                                </li>-->
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -440,9 +440,46 @@
                                             </div>
                                             <!--end::Tab Content-->
                                             <!--begin::Tab Content-->
-<!--                                            <div class="tab-pane" id="kt_apps_projects_view_tab_3" role="tabpanel">
+                                            <div class="tab-pane" id="kt_apps_projects_view_tab_3" role="tabpanel">
                                                 <div id="kt_kanban_3"></div>
-                                            </div>-->
+                                            </div>
+                                            <!--modales-->
+                                            <div class="modal fade" id="modalToDO" tabindex="-1" aria-labelledby="exampleModalSizeDefault" style="display: none;" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="modalToDOLabel">Agregar tarea</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <i aria-hidden="true" class="ki ki-close"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <!--begin::Form-->
+                                                            <form id="formTablero" method="POST">
+                                                                <input type="hidden" id="idPt" name="idPt" th:value="${proyecto.id}">
+                                                                <input type="hidden" id="idUs" name="idUs" th:value="${session.usuariosession.id}">
+                                                                <input type="hidden" id="nombreUser" name="nombreUser" th:value="${session.usuariosession.nombre+' '+session.usuariosession.apellido}">
+                                                                <input type="hidden" id="valueTipo" name="valueTipo">
+                                                                <div class="card-body">
+                                                                    <div class="form-group row">
+                                                                        <label class="col-lg-3 col-form-label text-lg-right">Descripción de la tarea:</label>
+                                                                        <div class="col-lg-8">
+                                                                            <input type="text" class="form-control" placeholder="Nombre de referencia" name="tarea" id='tarea' />
+                                                                            <span class="form-text text-muted">Ingrese un nombre descriptivo de la tarea</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" class="btn btn-primary font-weight-bold">Agregar</button>
+                                                                    <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Cancelar</button>
+                                                                </div>
+                                                            </form>
+                                                            <!--end::Form--> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--finmdoales-->
                                             <!--end::Tab Content-->
                                         </div>
                                     </div>

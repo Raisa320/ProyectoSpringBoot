@@ -200,3 +200,7 @@ element.style {
 .card-dash{
     width: 60em!important;
 }
+
+.kanban-board header .kanban-title-button {
+  float: right;
+}
