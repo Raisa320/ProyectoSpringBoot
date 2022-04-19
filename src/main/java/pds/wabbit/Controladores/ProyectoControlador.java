@@ -517,6 +517,7 @@ public class ProyectoControlador {
         try {
             Proyecto proyecto=proyectoServicio.buscarProyectoPorId(idProyecto);
             proyecto.getParticipantes().remove(0);
+            proyecto.setCupos(proyecto.getCupos()+1);
             proyectoRepositorio.save(proyecto);
             redirectAttrs
                     .addFlashAttribute("mensaje", "Usuario eliminado correctamente")
