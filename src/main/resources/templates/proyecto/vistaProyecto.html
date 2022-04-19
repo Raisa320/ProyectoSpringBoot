@@ -5,6 +5,7 @@
         <link th:replace="layout/head::head" th:remove="tag">
         <!--begin::Page Custom Styles(used by this page)-->
         <link href="assets/plugins/custom/kanban/kanban.bundle.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/custom/uppy/uppy.bundle.css" rel="stylesheet" type="text/css" />
         <!--end::Page Custom Styles-->
     </head>
     <!--end::Head-->
@@ -153,7 +154,7 @@
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                        
+
                                                     </div>
                                                     <div th:if="${proyecto.url!=null && proyecto.url!=''}" class="font-weight-bold mb-2 mt-5">Repositorio Proyecto: <a th:href="@{${proyecto.url}}" target="_blank" th:text="${proyecto.url}"></a></div>
                                                     <div th:if="${unido=='true'}" class="text-muted font-weight-bold mr-lg-8 mr-5 mb-lg-0 mt-2">
@@ -224,26 +225,72 @@
                                     </div>
                                 </div>
                                 <!--end::Card-->
-                                <div class="modal fade" id="exampleModalSizeSm" tabindex="-1" role="dialog" aria-labelledby="exampleModalSizeSm" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">Modal Title</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <i aria-hidden="true" class="ki ki-close"></i>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary font-weight-bold">Save changes</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 <!--begin: ADMINISTRACION PROYECTO-->
                                 <!--begin::Card-->
                                 <div th:if="${(unido=='true' || session.usuariosession.id==proyecto.usuarioCreador.id) && proyecto.participantes.size()>0 && proyecto.estadosProyecto.name()!='Finalizado'}" class="card card-custom  mr-lg-7 ml-lg-7">
+                                    <div class="modal fade" id="exampleModalSizeLg" tabindex="-1" role="dialog" aria-labelledby="exampleModalSizeSm" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-sticky-lg" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Nuevo Recurso</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <i aria-hidden="true" class="ki ki-close"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!--begin::Form-->
+                                                    <form id="modalForm" method="POST" enctype="multipart/form-data">
+                                                        <input type="hidden" id="idP" name="idP" th:value="${proyecto.id}">
+                                                        <input type="hidden" id="idU" name="idU" th:value="${session.usuariosession.id}">
+                                                        <div class="card-body">
+                                                            <div class="form-group row">
+                                                                <label class="col-lg-3 col-form-label text-lg-right">Titulo del recurso:</label>
+                                                                <div class="col-lg-8">
+                                                                    <input type="text" class="form-control" placeholder="Nombre de referencia" name="titulo" />
+                                                                    <span class="form-text text-muted">Ingrese un nombre descriptivo del recurso</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label class="col-lg-3 col-form-label text-lg-right">Tipo de recurso:</label>
+                                                                <div class="col-lg-8">
+                                                                    <select class="form-control" id="tipoRecurso">
+                                                                        <option value="web">Sitio Web</option>
+                                                                        <option value="archivo">Archivo</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row" id="tipoWeb">
+                                                                <label class="col-lg-3 col-form-label text-lg-right">URL:</label>
+                                                                <div class="col-lg-8">
+                                                                    <input type="text" class="form-control" id="urlPage" name="urlPag" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row" id="tipoArchivo" style="display: none;">
+                                                                <label class="col-lg-3 col-form-label text-lg-right">Subir Archivo:</label>
+                                                                <div class="col-lg-8">
+
+                                                                    <div class="uppy" id="kt_uppy_5">
+                                                                        <div class="uppy-wrapper" id="wrapper">
+                                                                            <input class="uppy-FileInput-input uppy-input-control subirimagen" type="file" name="file" id="kt_uppy_5_input_control" style="">
+                                                                            <label class="uppy-input-label btn btn-light-primary btn-sm btn-bold" for="kt_uppy_5_input_control" style="">Adjuntar Archivo</label>
+                                                                        </div>
+                                                                        <div class="uppy-list"></div>
+                                                                    </div>
+                                                                    <span class="form-text text-muted" id="spanLabel">El tamaño máximo del archivo debe ser de 5MB  </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-primary font-weight-bold">Subir</button>
+                                                        </div>
+                                                    </form>
+                                                    <!--end::Form-->
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                     <!--begin::Header-->
                                     <div class="card-header card-header-tabs-line">
                                         <div class="card-toolbar">
@@ -266,11 +313,11 @@
                                                         <span class="nav-text font-weight-bold">Recursos</span>
                                                     </a>
                                                 </li>
-                                                <li class="nav-item mr-3">
+<!--                                                <li class="nav-item mr-3">
                                                     <a class="nav-link" data-toggle="tab" href="#kt_apps_projects_view_tab_3">
                                                         <span class="nav-icon mr-2">
                                                             <span class="svg-icon mr-3">
-                                                                <!--begin::Svg Icon | path:assets/media/svg/icons/Devices/Display1.svg-->
+                                                                begin::Svg Icon | path:assets/media/svg/icons/Devices/Display1.svg
                                                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
                                                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                                                 <rect x="0" y="0" width="24" height="24" />
@@ -278,12 +325,12 @@
                                                                 <path d="M3,5 L21,5 C21.5522847,5 22,5.44771525 22,6 L22,16 C22,16.5522847 21.5522847,17 21,17 L3,17 C2.44771525,17 2,16.5522847 2,16 L2,6 C2,5.44771525 2.44771525,5 3,5 Z M4.5,8 C4.22385763,8 4,8.22385763 4,8.5 C4,8.77614237 4.22385763,9 4.5,9 L13.5,9 C13.7761424,9 14,8.77614237 14,8.5 C14,8.22385763 13.7761424,8 13.5,8 L4.5,8 Z M4.5,10 C4.22385763,10 4,10.2238576 4,10.5 C4,10.7761424 4.22385763,11 4.5,11 L7.5,11 C7.77614237,11 8,10.7761424 8,10.5 C8,10.2238576 7.77614237,10 7.5,10 L4.5,10 Z" fill="#000000" />
                                                                 </g>
                                                                 </svg>
-                                                                <!--end::Svg Icon-->
+                                                                end::Svg Icon
                                                             </span>
                                                         </span>
                                                         <span class="nav-text font-weight-bold">Tablero</span>
                                                     </a>
-                                                </li>
+                                                </li>-->
                                             </ul>
                                         </div>
                                     </div>
@@ -295,7 +342,7 @@
                                             <div class="tab-pane active" id="kt_apps_projects_view_tab_2" role="tabpanel">
                                                 <!--begin::Actions-->
                                                 <div class="d-flex align-items-center my-2">
-                                                    <span class="btn btn-light-success btn-sm text-uppercase font-weight-bolder" data-toggle="tooltip" title="Previose page">New Task</span>
+                                                    <button type="button" class="btn btn-light-success btn-sm text-uppercase font-weight-bolder" data-toggle="modal" data-target="#exampleModalSizeLg">Nuevo Recurso</button>
                                                 </div>
                                                 <!--end::Actions-->
                                                 <!--begin::Responsive container-->
@@ -303,28 +350,18 @@
                                                     <!--begin::Items-->
                                                     <div class="list list-hover min-w-500px" data-inbox="list">
                                                         <!--begin::Item-->
-                                                        <div class="d-flex align-items-start list-item card-spacer-x py-4" data-inbox="message">
-                                                            <!--begin::Toolbar-->
-                                                            <div class="d-flex align-items-center">
-                                                                <!--begin::Actions-->
-                                                                <div class="d-flex align-items-center mr-3" data-inbox="actions">
-                                                                    <!--begin::Buttons-->
-                                                                    <a href="#" class="btn btn-icon btn-xs text-hover-warning" data-toggle="tooltip" data-placement="right" title="Marcar como importante">
-                                                                        <i class="flaticon-add-label-button text-muted"></i>
-                                                                    </a>
-                                                                    <!--end::Buttons-->
-                                                                </div>
-                                                                <!--end::Actions-->
-                                                            </div>
-                                                            <!--end::Toolbar-->
+                                                        <div th:each="recursoItem:${recursosLista}" class="d-flex align-items-start list-item card-spacer-x py-4" th:onclick="mostrarModal([[${recursoItem.id}]])">
                                                             <!--begin::Info-->
                                                             <div class="flex-grow-1 mt-1 mr-2" data-toggle="view">
                                                                 <!--begin::Title-->
-                                                                <div class="font-weight-bolder mr-2">Digital PPV Customer Confirmation</div>
+                                                                <div class="font-weight-bolder mr-2" th:text="${recursoItem.titulo}"></div>
                                                                 <!--end::Title-->
                                                                 <!--begin::Labels-->
-                                                                <div class="mt-2">
-                                                                    <span class="label label-light-primary font-weight-bold label-inline">inbox</span>
+                                                                <div th:if="${recursoItem.nameFile!=null}" class="mt-2">
+                                                                    <span class="label label-light-primary font-weight-bold label-inline">File</span>
+                                                                </div>
+                                                                <div th:if="${recursoItem.urlWeb!=null}" class="mt-2">
+                                                                    <span class="label label-light-info font-weight-bold label-inline">Link</span>
                                                                 </div>
                                                                 <!--end::Labels-->
                                                             </div>
@@ -332,63 +369,80 @@
                                                             <!--begin::Details-->
                                                             <div class="d-flex align-items-center justify-content-end flex-wrap" data-toggle="view">
                                                                 <!--begin::Datetime-->
-                                                                <div class="font-weight-bolder" data-toggle="view">8:30 PM</div>
+                                                                <div class="font-weight-bolder" data-toggle="view" th:text="${recursoItem.usuario.nombre}"></div>
                                                                 <!--end::Datetime-->
                                                                 <!--begin::User Photo-->
-                                                                <span class="symbol symbol-30 ml-3">
-                                                                    <!--                                                                    <div th:each="user,iterador:${proyecto.participantes}" th:if="${iterador.index<5}" class="symbol symbol-30 symbol-circle symbol-light-success" data-toggle="tooltip" th:title="${user.nombre+' '+user.apellido}">
-                                                                                                                                                                <span th:if="${user.avatar==null}" class="symbol-label font-size-h2 font-weight-bold" th:text="${user.nombre.substring(0,1)}"></span>
-                                                                                                                                                                <img th:if="${user.avatar!=null}" th:src="${'assets/media/svg/avatars/'+user.avatar+'.svg'}" />
-                                                                                                                                                            </div>-->
-                                                                    <span class="symbol-label" style="background-image: url('assets/media/users/100_13.jpg')"></span>
+                                                                <span class="symbol symbol-light-success symbol-30 ml-3">
+                                                                    <span th:if="${recursoItem.usuario.avatar==null}" class="symbol-label font-size-h5 font-weight-bold" th:text="${recursoItem.usuario.nombre.substring(0,1)}"></span>
+                                                                    <span th:if="${recursoItem.usuario.avatar!=null}" class="symbol-label" th:style="|background:url(@{'assets/media/svg/avatars/'+${recursoItem.usuario.avatar}+'.svg'});|"></span>
                                                                 </span>
                                                                 <!--end::User Photo-->
                                                             </div>
+
+                                                            <!--MODAL-->
+                                                            <div class="modal fade" th:id="${recursoItem.id}" tabindex="-1" aria-labelledby="exampleModalSizeLg" style="display: none;" aria-hidden="true">
+                                                                <div class="modal-dialog modal-dialog-centered modal-sticky-lg" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-body">
+                                                                            <div class="card card-custom wave wave-animate-slow wave-primary mb-8 mb-lg-0">
+                                                                                <div class="card-body">
+                                                                                    <div class="d-flex align-items-center p-5">
+                                                                                        <div class="mr-6">
+                                                                                            <span th:if="${recursoItem.urlWeb!=null}" class="svg-icon svg-icon-primary svg-icon-4x">
+                                                                                                <!--begin::Svg Icon | path:/metronic/theme/html/demo1/dist/assets/media/svg/icons/Weather/Cloud2.svg-->
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                                                <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                                                                                <circle fill="#000000" opacity="0.3" cx="16" cy="10" r="5"></circle>
+                                                                                                <path d="M5.74714567,18.0425758 C4.09410362,16.9740356 3,15.1147886 3,13 C3,9.6862915 5.6862915,7 9,7 C11.7957591,7 14.1449096,8.91215918 14.8109738,11.5 L17.25,11.5 C19.3210678,11.5 21,13.1789322 21,15.25 C21,17.3210678 19.3210678,19 17.25,19 L8.25,19 C7.28817895,19 6.41093178,18.6378962 5.74714567,18.0425758 Z" fill="#000000"></path>
+                                                                                                </g>
+                                                                                                </svg>
+                                                                                                <!--end::Svg Icon-->
+                                                                                            </span>
+                                                                                            <span th:if="${recursoItem.nameFile!=null}" class="svg-icon svg-icon-primary svg-icon-4x">
+                                                                                                <!--begin::Svg Icon | path:/metronic/theme/html/demo1/dist/assets/media/svg/icons/Communication/Clipboard-check.svg-->
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                                                                <path d="M8,3 L8,3.5 C8,4.32842712 8.67157288,5 9.5,5 L14.5,5 C15.3284271,5 16,4.32842712 16,3.5 L16,3 L18,3 C19.1045695,3 20,3.8954305 20,5 L20,21 C20,22.1045695 19.1045695,23 18,23 L6,23 C4.8954305,23 4,22.1045695 4,21 L4,5 C4,3.8954305 4.8954305,3 6,3 L8,3 Z" fill="#000000" opacity="0.3"></path>
+                                                                                                <path d="M10.875,15.75 C10.6354167,15.75 10.3958333,15.6541667 10.2041667,15.4625 L8.2875,13.5458333 C7.90416667,13.1625 7.90416667,12.5875 8.2875,12.2041667 C8.67083333,11.8208333 9.29375,11.8208333 9.62916667,12.2041667 L10.875,13.45 L14.0375,10.2875 C14.4208333,9.90416667 14.9958333,9.90416667 15.3791667,10.2875 C15.7625,10.6708333 15.7625,11.2458333 15.3791667,11.6291667 L11.5458333,15.4625 C11.3541667,15.6541667 11.1145833,15.75 10.875,15.75 Z" fill="#000000"></path>
+                                                                                                <path d="M11,2 C11,1.44771525 11.4477153,1 12,1 C12.5522847,1 13,1.44771525 13,2 L14.5,2 C14.7761424,2 15,2.22385763 15,2.5 L15,3.5 C15,3.77614237 14.7761424,4 14.5,4 L9.5,4 C9.22385763,4 9,3.77614237 9,3.5 L9,2.5 C9,2.22385763 9.22385763,2 9.5,2 L11,2 Z" fill="#000000"></path>
+                                                                                                </g>
+                                                                                                </svg>
+                                                                                                <!--end::Svg Icon-->
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <div class="d-flex flex-column">
+                                                                                            <a class="text-dark text-hover-primary font-weight-bold font-size-h4 mb-3" th:text="${recursoItem.titulo}">Get Started</a>
+                                                                                            <div class="text-dark-75">
+                                                                                                <p>Recurso subido por: <span class="font-weight-bold" th:text="${recursoItem.usuario.nombre+' '+recursoItem.usuario.apellido}"></span></p>
+                                                                                                <p th:if="${recursoItem.urlWeb!=null}">Se ha agregado el siguiente link para revisar:<br> <a th:href="${recursoItem.urlWeb}" th:text="${recursoItem.urlWeb}" target="_blank"></a></p>
+                                                                                                <a th:if="${recursoItem.nameFile!=null}" th:href="@{|/recurso/|+${recursoItem.nameFile}}">Descargar Archivo</a>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--FIN DE MODAL-->
+
                                                             <!--end::Details-->
                                                         </div>
                                                         <!--end::Item-->
                                                     </div>
+
                                                     <!--end::Items-->
                                                 </div>
                                                 <!--end::Responsive container-->
-                                                <!--begin::Pagination-->
-                                                <div class="d-flex align-items-center my-2 my-6 card-spacer-x justify-content-end">
-                                                    <div class="d-flex align-items-center mr-2" data-toggle="tooltip" title="Records per page">
-                                                        <span class="text-muted font-weight-bold mr-2" data-toggle="dropdown">1 - 50 of 235</span>
-                                                        <div class="dropdown-menu dropdown-menu-right p-0 m-0 dropdown-menu-sm">
-                                                            <ul class="navi py-3">
-                                                                <li class="navi-item">
-                                                                    <a href="#" class="navi-link">
-                                                                        <span class="navi-text">20 per page</span>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="navi-item">
-                                                                    <a href="#" class="navi-link active">
-                                                                        <span class="navi-text">50 par page</span>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="navi-item">
-                                                                    <a href="#" class="navi-link">
-                                                                        <span class="navi-text">100 per page</span>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                    <span class="btn btn-default btn-icon btn-sm mr-2" data-toggle="tooltip" title="Previose page">
-                                                        <i class="ki ki-bold-arrow-back icon-sm"></i>
-                                                    </span>
-                                                    <span class="btn btn-default btn-icon btn-sm" data-toggle="tooltip" title="Next page">
-                                                        <i class="ki ki-bold-arrow-next icon-sm"></i>
-                                                    </span>
-                                                </div>
-                                                <!--end::Pagination-->
                                             </div>
                                             <!--end::Tab Content-->
                                             <!--begin::Tab Content-->
-                                            <div class="tab-pane" id="kt_apps_projects_view_tab_3" role="tabpanel">
+<!--                                            <div class="tab-pane" id="kt_apps_projects_view_tab_3" role="tabpanel">
                                                 <div id="kt_kanban_3"></div>
-                                            </div>
+                                            </div>-->
                                             <!--end::Tab Content-->
                                         </div>
                                     </div>
@@ -429,8 +483,13 @@
     <!--begin::Page Vendors(used by this page)-->
     <script src="assets/js/proyecto/proyectoUnirse.js"></script>
     <!--begin::Page Scripts(used by this page)-->
+    <!--<script src="assets/plugins/custom/uppy/uppy.bundle.js"></script>-->
+    <!--<script src="assets/js/pages/file-upload/uppy.js"></script>-->
+    <script src="https://releases.transloadit.com/uppy/locales/v2.0.8/es_ES.min.js"></script>
     <script src="assets/plugins/custom/kanban/kanban.bundle.js"></script>
     <script src="assets/js/pages/miscellaneous/kanban-board.js"></script>
+    <script src="assets/js/proyecto/proyectoRecursos.js"></script>
+
     <!--end::Page Scripts-->
     <!--end::Page Vendors-->
 </body>

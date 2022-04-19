@@ -40,6 +40,7 @@ import pds.wabbit.Enumeraciones.Temas;
 import pds.wabbit.Repositorios.IProyectoRepositorio;
 import pds.wabbit.Servicios.EmailServicio;
 import pds.wabbit.Servicios.ProyectoServicio;
+import pds.wabbit.Servicios.RecursoServicio;
 import pds.wabbit.Servicios.UsuarioServicio;
 import pds.wabbit.errores.ErrorServicio;
 
@@ -50,6 +51,9 @@ public class ProyectoControlador {
 
     @Autowired
     private ProyectoServicio proyectoServicio;
+    
+    @Autowired
+    private RecursoServicio recursoServicio;
 
     @Autowired
     private IProyectoRepositorio proyectoRepositorio;
@@ -366,6 +370,7 @@ public class ProyectoControlador {
             modelo.addAttribute("like", "true");
         }
         modelo.addAttribute("unido", unido);
+        modelo.addAttribute("recursosLista", recursoServicio.recursosProyecto(idProyecto));
         //modelo.addAttribute("temas", Temas.values());
         return "proyecto/vistaProyecto.html";
     }
