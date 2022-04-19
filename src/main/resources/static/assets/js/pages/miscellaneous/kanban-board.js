@@ -2,9 +2,9 @@
 
 // Class definition
 
-var KTKanbanBoardDemo = function() {
+var KTKanbanBoardDemo = function () {
     // Private functions
-    var _demo1 = function() {
+    var _demo1 = function () {
         var kanban = new jKanban({
             element: '#kt_kanban_1',
             gutter: '0',
@@ -44,7 +44,7 @@ var KTKanbanBoardDemo = function() {
         });
     }
 
-    var _demo2 = function() {
+    var _demo2 = function () {
         var kanban = new jKanban({
             element: '#kt_kanban_2',
             gutter: '0',
@@ -93,81 +93,182 @@ var KTKanbanBoardDemo = function() {
         });
     }
 
-    var _demo3 = function() {
-        var kanban = new jKanban({
-            element: '#kt_kanban_3',
-            gutter: '0',
-            widthBoard: '250px',
-            click: function(el) {
-                alert(el.innerHTML);
-            },
-            boards: [{
-                    'id': '_todo',
-                    'title': 'Por Hacer',
-                    'class': 'light-primary',
-                    'dragTo': ['_working'],
-                    'item': [{
-                            'title': 'My Task Test',
-                            'class': 'primary'
-                        },
-                        {
-                            'title': 'Buy Milk',
-                            'class': 'primary'
-                        }
-                    ]
+    var _demo3 = function () {
+        var proyectoID = $("#idPt").val();
+        $.ajax({
+            url: "/tablero/lista/" + proyectoID,
+            type: "get",
+            dataType: "html",
+            cache: false,
+            contentType: false,
+            processData: false
+        }).done(function (res) {
+            var kanban = new jKanban({
+                element: '#kt_kanban_3',
+                gutter: '0',
+                widthBoard: '250px',
+                dropEl: function (el, target, source, sibling) {
+                    console.log(el)
+                    var boardFinal = el.parentNode.parentNode;
+                    var idBoard = boardFinal.dataset.id;
+                    var idTarea = el.dataset.tarea;
+                    switch (idBoard) {
+                        case "_todo":
+                            el.dataset.class = "primary toDo";
+                            break;
+                        case "_working":
+                            el.dataset.class = "warning work";
+                            break;
+                        case "_done":
+                            el.dataset.class = "success Done";
+                            break;
+                        case "_notes":
+                            el.dataset.class = "danger Not";
+                            break;
+                    }
+                    $.ajax({
+                        url: "/tablero/cambio/" + idTarea+"/"+idBoard,
+                        type: "get",
+                        dataType: "html",
+                        cache: false,
+                        contentType: false,
+                        processData: false
+                    });
                 },
-                {
-                    'id': '_working',
-                    'title': 'Trabajando',
-                    'class': 'light-warning',
-                    'item': [{
-                            'title': 'Do Something!',
-                            'class': 'warning'
-                        },
-                        {
-                            'title': 'Run?',
-                            'class': 'warning'
-                        }
-                    ]
-                },
-                {
-                    'id': '_done',
-                    'title': 'Hecho',
-                    'class': 'light-success',
-                    'dragTo': ['_working'],
-                    'item': [{
-                            'title': 'All right',
-                            'class': 'success'
-                        },
-                        {
-                            'title': 'Ok!',
-                            'class': 'success'
-                        }
-                    ]
-                },
-                {
-                    'id': '_notes',
-                    'title': 'Notas',
-                    'class': 'light-danger',
-                    'item': [{
-                            'title': 'Warning Task',
-                            'class': 'danger'
-                        },
-                        {
-                            'title': 'Do not enter',
-                            'class': 'danger'
-                        }
-                    ]
+                boards: JSON.parse(res),
+                dragBoards: false,
+                itemAddOptions: {
+                    enabled: true, // add a button to board for easy item creation
+                    content: '+', // text or html content of the board button   
+                    class: 'kanban-title-button btn btn-default btn-xs', // default class of the button
+                    footer: false                                                // position the button on footer
                 }
-            ]
-        });
-    }
+            });
+            var validator = FormValidation.formValidation(
+                    document.getElementById('formTablero'),
+                    {
+                        fields: {
+                            tarea: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Título requerido'
+                                    }
+                                }
+                            }
+                        },
 
-    var _demo4 = function() {
+                        plugins: {//Learn more: https://formvalidation.io/guide/plugins
+                            trigger: new FormValidation.plugins.Trigger(),
+                            // Bootstrap Framework Integration
+                            bootstrap: new FormValidation.plugins.Bootstrap(),
+                            excluded: new FormValidation.plugins.Excluded(),
+                            // Validate fields when clicking the Submit button
+                            submitButton: new FormValidation.plugins.SubmitButton(),
+                            // Submit the form when all fields are valid
+                            //defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                        }
+                    }
+            ).on('core.form.valid', function () {
+                var tipo = $("#valueTipo").val();
+                var tarea = $("#tarea").val();
+                var nombreUser = $("#nombreUser").val();
+                formarItem(tipo, tarea, nombreUser);
+
+                var form_data = new FormData($("form#formTablero")[0]);
+                form_data.append("dato", "valor");
+                $("#modalToDO").modal("hide");
+                $("#tarea").val("");
+                //formData.append(f.attr("name"), $(this)[0].files[0]);
+                $.ajax({
+                    url: "/tablero/crearTarea",
+                    type: "post",
+                    dataType: "html",
+                    data: form_data,
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                }).done(function (res) {
+                    console.log("exito");
+
+                }).fail(function () {
+                    console.log("error");
+                });
+
+            });
+
+            var toDoButton = document.getElementById('_todobutton');
+
+            toDoButton.addEventListener('click', function () {
+                $("#modalToDO").modal("show");
+                $("#valueTipo").val("_todo");
+
+            });
+            var workButton = document.getElementById('_workingbutton');
+            workButton.addEventListener('click', function () {
+                $("#modalToDO").modal("show");
+                $("#valueTipo").val("_working");
+
+            });
+            var doneButton = document.getElementById('_donebutton');
+            doneButton.addEventListener('click', function () {
+                $("#modalToDO").modal("show");
+                $("#valueTipo").val("_done");
+
+            });
+            var noteButton = document.getElementById('_notesbutton');
+            noteButton.addEventListener('click', function () {
+                $("#modalToDO").modal("show");
+                $("#valueTipo").val("_notes");
+
+            });
+
+            function formarItem(tipo, tarea, nombreUser) {
+                switch (tipo) {
+                    case "_todo":
+                        kanban.addElement(
+                                '_todo', {
+                                    'title': tarea + '<br> <span class="label label-inline label-light-success font-weight-bold">' + nombreUser + '</span>',
+                                    'class': 'primary toDo'
+                                }
+                        );
+                        break;
+                    case "_working":
+                        kanban.addElement(
+                                '_working', {
+                                    'title': tarea + '<br> <span class="label label-inline label-light-success font-weight-bold">' + nombreUser + '</span>',
+                                    'class': 'warning work'
+                                }
+                        );
+                        break;
+                    case "_done":
+                        kanban.addElement(
+                                '_done', {
+                                    'title': tarea + '<br> <span class="label label-inline label-light-success font-weight-bold">' + nombreUser + '</span>',
+                                    'class': 'success Done'
+                                }
+                        );
+                        break;
+                    case "_notes":
+                        kanban.addElement(
+                                '_notes', {
+                                    'title': tarea + '<br> <span class="label label-inline label-light-success font-weight-bold">' + nombreUser + '</span>',
+                                    'class': 'danger Not'
+                                }
+                        );
+                        break;
+                }
+            }
+        }).fail(function () {
+            console.log("error");
+        });
+
+    };
+
+    var _demo4 = function () {
         var kanban = new jKanban({
             element: '#kt_kanban_4',
             gutter: '0',
-            click: function(el) {
+            click: function (el) {
                 alert(el.innerHTML);
             },
             boards: [{
@@ -334,10 +435,10 @@ var KTKanbanBoardDemo = function() {
         });
 
         var toDoButton = document.getElementById('addToDo');
-        toDoButton.addEventListener('click', function() {
+        toDoButton.addEventListener('click', function () {
             kanban.addElement(
-                '_todo', {
-                    'title': `
+                    '_todo', {
+                        'title': `
                         <div class="d-flex align-items-center">
                             <div class="symbol symbol-light-primary mr-3">
                                 <img alt="Pic" src="assets/media/users/300_14.jpg" />
@@ -348,19 +449,19 @@ var KTKanbanBoardDemo = function() {
                             </div>
                         </div>
                     `
-                }
+                    }
             );
         });
 
         var addBoardDefault = document.getElementById('addDefault');
-        addBoardDefault.addEventListener('click', function() {
+        addBoardDefault.addEventListener('click', function () {
             kanban.addBoards(
-                [{
-                    'id': '_default',
-                    'title': 'New Board',
-                    'class': 'primary-light',
-                    'item': [{
-                            'title': `
+                    [{
+                            'id': '_default',
+                            'title': 'New Board',
+                            'class': 'primary-light',
+                            'item': [{
+                                    'title': `
                                 <div class="d-flex align-items-center">
                                     <div class="symbol symbol-success mr-3">
                                         <img alt="Pic" src="assets/media/users/300_13.jpg" />
@@ -370,8 +471,8 @@ var KTKanbanBoardDemo = function() {
                                         <span class="label label-inline label-light-primary font-weight-bold">In development</span>
                                     </div>
                                 </div>
-                        `},{
-                            'title': `
+                        `}, {
+                                    'title': `
                                 <div class="d-flex align-items-center">
                                     <div class="symbol symbol-success mr-3">
                                         <img alt="Pic" src="assets/media/users/300_12.jpg" />
@@ -382,20 +483,20 @@ var KTKanbanBoardDemo = function() {
                                 </div>
                             </div>
                         `}
-                    ]
-                }]
-            )
+                            ]
+                        }]
+                    )
         });
 
         var removeBoard = document.getElementById('removeBoard');
-        removeBoard.addEventListener('click', function() {
+        removeBoard.addEventListener('click', function () {
             kanban.removeBoard('_done');
         });
     }
 
     // Public functions
     return {
-        init: function() {
+        init: function () {
             //_demo1();
             //_demo2();
             _demo3();
@@ -404,6 +505,6 @@ var KTKanbanBoardDemo = function() {
     };
 }();
 
-jQuery(document).ready(function() {
+jQuery(document).ready(function () {
     KTKanbanBoardDemo.init();
 });
