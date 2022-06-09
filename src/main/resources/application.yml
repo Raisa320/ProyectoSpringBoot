@@ -15,7 +15,7 @@ spring:
                 starttls:
                     enable: true
     username: vr3148910@gmail.com 
-    password: 741852rv
+    password: *******
     
 
   datasource: 
