@@ -29,7 +29,7 @@ public class EmailServicio {
     private final String puerto = "587";
     private final String servidorSMTP = "smtp.gmail.com";
     private final String usuarioSMTP = "vr3148910@gmail.com";
-    private final String claveSMTP = "741852rv";
+    private final String claveSMTP = "";
 
     private Logger log = LoggerFactory.getLogger(EmailServicio.class);
 
